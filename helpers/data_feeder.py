@@ -14,7 +14,7 @@ from scipy.signal import hamming
 from helpers.audio_io import wav_read, wav_write
 from helpers.signal_transforms import stft, i_stft, ideal_ratio_masking
 
-__author__ = 'Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT'
+__author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
 __all__ = ['data_feeder_training', 'data_feeder_testing']
 
