@@ -101,7 +101,6 @@ def training_process():
         seq_length=seq_length,
         context_length=context_length,
         batch_size=batch_size,
-        subset='training',
         files_per_pass=files_per_pass,
         debug=debug
     )
