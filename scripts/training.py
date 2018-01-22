@@ -11,7 +11,7 @@ import torch
 from torch import optim
 from torch.autograd import Variable
 
-from helpers.data_feeder import training_data_feeder
+from helpers.data_feeder import data_feeder_training
 from modules import RNNEnc, RNNDec, FNNMasker, FNNDenoiser, AffineTransform
 from objectives import kullback_leibler as kl, l2_loss, sparsity_penalty, l2_reg
 
@@ -94,7 +94,7 @@ def training_process():
     print('-- Optimizer set up')
 
     # Initializing data feeder
-    epoch_it = training_data_feeder(
+    epoch_it = data_feeder_training(
         window_size=window_size,
         fft_size=fft_size,
         hop_size=hop_size,
