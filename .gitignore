@@ -6,6 +6,11 @@ dataset/Mixtures/*
 dataset/Sources/*
 !dataset/.dummy.txt
 
+outputs/audio_files/*
+!outputs/audio_files/.dummy.txt
+outputs/metrics/*
+!outputs/metrics/.dummy.txt
+
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
 # Byte-compiled / optimized / DLL files
