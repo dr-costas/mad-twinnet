@@ -1,3 +1,9 @@
+# Project specific rules
+states/*
+!states/.dummy.txt
+dataset/Mixtures/*
+dataset/Sources/*
+
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
 # Byte-compiled / optimized / DLL files
@@ -226,7 +232,7 @@ acs-*.bib
 
 # knitr
 *-concordance.tex
-# TODO Comment the next line if you want to keep your tikz graphics files
+# Comment the next line if you want to keep your tikz graphics files
 *.tikz
 *-tikzDictionary
 
@@ -327,7 +333,7 @@ TSWLatexianTemp*
 *~[0-9]*
 
 # auto folder when using emacs and auctex
-./auto/*
+auto/*
 *.el
 
 # expex forward references with \gathertags
