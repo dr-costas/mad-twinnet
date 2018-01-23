@@ -5,6 +5,7 @@
 """
 
 import os
+from operator import itemgetter
 
 import numpy as np
 from mir_eval import separation as bss_eval
@@ -12,16 +13,14 @@ from numpy.lib import stride_tricks
 from scipy.signal import hamming
 
 from helpers.audio_io import wav_read, wav_write
+from helpers.settings import dataset_paths, output_audio_paths, wav_quality
 from helpers.signal_transforms import stft, i_stft, ideal_ratio_masking
 
 __author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
-__all__ = ['data_feeder_training', 'data_feeder_testing']
+__all__ = ['data_feeder_training', 'data_feeder_testing', 'data_process_results_testing']
 
-# Paths of the dataset
-_dataset_parent_dir = 'dataset'
-_mixtures_dir = os.path.join(_dataset_parent_dir, 'Mixtures')
-_sources_dir = os.path.join(_dataset_parent_dir, 'Sources')
+_get_me_sdr_and_sir = itemgetter(0, 2)
 
 
 def data_feeder_training(window_size, fft_size, hop_size, seq_length, context_length,
@@ -38,6 +37,10 @@ def data_feeder_training(window_size, fft_size, hop_size, seq_length, context_le
     :type seq_length: int
     :param context_length: The context length in frames.
     :type context_length: int
+    :param batch_size: The batch size.
+    :type batch_size: int
+    :param files_per_pass: How many files per pass.
+    :type files_per_pass: int
     :param batch_size: The batch size.
     :type batch_size: int
     :param files_per_pass: How many files per pass.
@@ -104,8 +107,7 @@ def data_feeder_testing(window_size, fft_size, hop_size, seq_length, context_len
     :param debug: A flag to indicate debug
     :type debug: bool
     :return: An iterator that will provide the input and target values.\
-             The iterator yields (mix, voice true, bg true, mix magnitude,\
-             mix phase) values.
+             The iterator yields (mix, mix magnitude, mix phase, voice true, bg true) values.
     :rtype: callable
     """
     sources_list = _get_files_lists('testing')[-1]
@@ -124,11 +126,11 @@ def data_feeder_testing(window_size, fft_size, hop_size, seq_length, context_len
             if debug:
                 break
 
-    return testing_it()
+    return testing_it
 
 
-def data_process_results_testing(index, voice_true, bg_true, save_path, voice_predicted,
-                                 window_size, mix_magnitude, mix_phase, hop, context_length):
+def data_process_results_testing(index, voice_true, bg_true, voice_predicted,
+                                 window_size, mix, mix_magnitude, mix_phase, hop, context_length):
     """Calculates SDR and SIR and creates the resulting audio files.
 
     :param index: The index of the current source/track.
@@ -137,12 +139,12 @@ def data_process_results_testing(index, voice_true, bg_true, save_path, voice_pr
     :type voice_true: numpy.core.multiarray.ndarray
     :param bg_true: The true background music.
     :type bg_true: numpy.core.multiarray.ndarray
-    :param save_path: The path to save the audio (.wav) files.
-    :type save_path: str
     :param voice_predicted: The predicted voice.
     :type voice_predicted: numpy.core.multiarray.ndarray
     :param window_size: The window size in samples.
     :type window_size: int
+    :param mix: The mixture.
+    :type mix: numpy.core.multiarray.ndarray
     :param mix_magnitude: The mixture magnitude.
     :type mix_magnitude: numpy.core.multiarray.ndarray
     :param mix_phase: The mixture phase.
@@ -161,28 +163,32 @@ def data_process_results_testing(index, voice_true, bg_true, save_path, voice_pr
     voice_hat = i_stft(voice_predicted, mix_phase, window_size, hop)
 
     # Removing the samples that no estimation exists
-    mix_magnitude = mix_magnitude[context_length * hop:]
+    mix = mix[context_length * hop:]
     voice_true = voice_true[context_length * hop:]
     bg_true = bg_true[context_length * hop:]
 
-    max_len = max(len(voice_true), len(voice_hat))
+    min_len = min(len(voice_true), len(voice_hat))
 
     # Background music estimation
-    bg_hat = mix_magnitude[:max_len] - voice_hat[:max_len]
+    bg_hat = mix[:min_len] - voice_hat[:min_len]
 
-    wav_write(voice_true, 44100, 16, os.path.join(save_path, 'voice_true_{}.wav'.format(index)))
-    wav_write(bg_true, 44100, 16, os.path.join(save_path, 'bg_true_{}.wav'.format(index)))
-    wav_write(voice_hat, 44100, 16, os.path.join(save_path, 'voice_predicted_{}.wav'.format(index)))
-    wav_write(bg_hat, 44100, 16, os.path.join(save_path, 'bg_predicted_{}.wav'.format(index)))
-    wav_write(mix_magnitude, 44100, 16, os.path.join(save_path, 'mix_true_{}.wav'.format(index)))
+    example_index = index + 1
+
+    wav_write(voice_true, file_name=output_audio_paths['voice_true'].format(p=example_index), **wav_quality)
+    wav_write(voice_hat, file_name=output_audio_paths['voice_predicted'].format(p=example_index), **wav_quality)
+
+    wav_write(bg_true, file_name=output_audio_paths['bg_true'].format(p=example_index), **wav_quality)
+    wav_write(bg_hat, file_name=output_audio_paths['bg_predicted'].format(p=example_index), **wav_quality)
+
+    wav_write(mix, file_name=output_audio_paths['mix'].format(p=example_index), **wav_quality)
 
     # Metrics calculation
-    c_sdr, _, c_sir, __, ___ = bss_eval.bss_eval_images_framewise(
-        [voice_true[:max_len], bg_true[:max_len]],
-        [voice_hat[:max_len], bg_hat[:max_len]]
-    )
+    sdr, sir = _get_me_sdr_and_sir(bss_eval.bss_eval_images_framewise(
+        [voice_true[:min_len], bg_true[:min_len]],
+        [voice_hat[:min_len], bg_hat[:min_len]]
+    ))
 
-    return c_sdr, c_sir
+    return sdr, sir
 
 
 def _get_files_lists(subset):
@@ -194,8 +200,8 @@ def _get_files_lists(subset):
     :rtype: (list[str], list[str])
     """
     specific_dir = 'Dev' if subset == 'training' else 'Test'
-    mixtures_dir = os.path.join(_mixtures_dir, specific_dir)
-    sources_dir = os.path.join(_sources_dir, specific_dir)
+    mixtures_dir = os.path.join(dataset_paths['mixtures'], specific_dir)
+    sources_dir = os.path.join(dataset_paths['sources'], specific_dir)
 
     mixtures_list = [os.path.join(mixtures_dir, file_path)
                      for file_path in sorted(os.listdir(mixtures_dir))]
@@ -377,6 +383,6 @@ def _get_data_testing(sources_parent_path, window_values, fft_size, hop,
         mix_magnitude, mix_phase, mix_phase,
         seq_length, context_length * 2, batch_size)
 
-    return mix, voice_true, bg_true, mix_magnitude, mix_phase
+    return mix, mix_magnitude, mix_phase, voice_true, bg_true
 
 # EOF
