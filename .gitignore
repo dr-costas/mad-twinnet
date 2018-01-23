@@ -11,6 +11,9 @@ outputs/audio_files/*
 outputs/metrics/*
 !outputs/metrics/.dummy.txt
 
+outputs/states/*
+!outputs/states/.dummy.txt
+
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
 # Byte-compiled / optimized / DLL files

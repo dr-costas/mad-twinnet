@@ -29,7 +29,7 @@ _debug_suffix = '_debug' if debug else ''
 # Paths
 _dataset_parent_dir = 'dataset'
 _outputs_path = 'outputs'
-_states_path = 'states'
+_states_path = os.path.join(_outputs_path, 'states')
 _metrics_path = os.path.join(_outputs_path, 'metrics')
 _audio_files_path = os.path.join(_outputs_path, 'audio_files')
 
