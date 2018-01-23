@@ -4,15 +4,17 @@
 """The RNN dec of the Masker.
 """
 
-import torch
-from torch import nn
+from torch import has_cudnn as torch_has_cudnn, zeros as torch_zeros
 from torch.autograd import Variable
+from torch.nn import Module, GRUCell
+from torch.nn.init import xavier_normal, orthogonal
 
-__author__ = 'Konstantinos Drossos -- TUT, Stylianos Mimilakis -- Fraunhofer IDMT'
+__author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
+__all__ = ['RNNDec']
 
 
-class RNNDec(nn.Module):
+class RNNDec(Module):
     def __init__(self, input_dim, debug):
         """The RNN dec of the Masker.
 
@@ -24,7 +26,7 @@ class RNNDec(nn.Module):
         super(RNNDec, self).__init__()
 
         self._input_dim = input_dim
-        self.gru_dec = nn.GRUCell(self._input_dim, self._input_dim)
+        self.gru_dec = GRUCell(self._input_dim, self._input_dim)
 
         self._debug = debug
 
@@ -34,11 +36,11 @@ class RNNDec(nn.Module):
         """Manual weight/bias initialization.
         """
 
-        nn.init.orthogonal(self.gru_dec.weight_hh)
-        nn.init.xavier_normal(self.gru_dec.weight_ih)
+        xavier_normal(self.gru_dec.weight_ih)
+        orthogonal(self.gru_dec.weight_hh)
 
-        self.gru_dec.bias_hh.data.zero_()
         self.gru_dec.bias_ih.data.zero_()
+        self.gru_dec.bias_hh.data.zero_()
 
     def forward(self, h_enc):
         """The forward pass.
@@ -50,10 +52,10 @@ class RNNDec(nn.Module):
         """
         batch_size = h_enc.size()[0]
         seq_length = h_enc.size()[1]
-        h_t_dec = Variable(torch.zeros(batch_size, self._input_dim))
-        h_j_dec = Variable(torch.zeros(batch_size, seq_length, self._input_dim))
+        h_t_dec = Variable(torch_zeros(batch_size, self._input_dim))
+        h_j_dec = Variable(torch_zeros(batch_size, seq_length, self._input_dim))
 
-        if not self._debug and torch.has_cudnn:
+        if not self._debug and torch_has_cudnn:
             h_t_dec = h_t_dec.cuda()
             h_j_dec = h_j_dec.cuda()
 

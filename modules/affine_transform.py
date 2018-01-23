@@ -4,13 +4,15 @@
 """The affine transform for the TwinNet regularization.
 """
 
-from torch import nn
+from torch.nn import Module, Linear
+from torch.nn.init import xavier_normal
 
-__author__ = 'Konstantinos Drossos -- TUT, Stylianos Mimilakis -- Fraunhofer IDMT'
+__author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
+__all__ = ['AffineTransform']
 
 
-class AffineTransform(nn.Module):
+class AffineTransform(Module):
     def __init__(self, input_dim):
         """The affine transform for the TwinNet regularization.
 
@@ -21,14 +23,14 @@ class AffineTransform(nn.Module):
         super(AffineTransform, self).__init__()
 
         self._input_dim = input_dim
-        self.linear_layer = nn.Linear(self._input_dim, self._input_dim)
+        self.linear_layer = Linear(self._input_dim, self._input_dim)
 
         self.initialize_decoder()
 
     def initialize_decoder(self):
         """Manual weight/bias initialization.
         """
-        nn.init.xavier_normal(self.linear_layer.weight)
+        xavier_normal(self.linear_layer.weight)
         self.linear_layer.bias.data.zero_()
 
     def forward(self, h_j_dec):

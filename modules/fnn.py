@@ -4,14 +4,16 @@
 """The FNN of the Masker.
 """
 
-import torch
-from torch import nn
+from torch.nn import Module, Linear
+from torch.nn.functional import relu
+from torch.nn.init import xavier_normal
 
-__author__ = 'Konstantinos Drossos -- TUT, Stylianos Mimilakis -- Fraunhofer IDMT'
+__author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
+__all__ = ['FNNMasker']
 
 
-class FNNMasker(nn.Module):
+class FNNMasker(Module):
     def __init__(self, input_dim, output_dim, context_length):
         """The FNN of the Masker.
 
@@ -29,15 +31,14 @@ class FNNMasker(nn.Module):
         self._output_dim = output_dim
         self._context_length = context_length
 
-        self.linear_layer = nn.Linear(self._input_dim, self._output_dim)
-        self.relu = nn.ReLU()
+        self.linear_layer = Linear(self._input_dim, self._output_dim)
 
         self.initialize_decoder()
 
     def initialize_decoder(self):
         """Manual weight/bias initialization.
         """
-        nn.init.xavier_normal(self.linear_layer.weight)
+        xavier_normal(self.linear_layer.weight)
         self.linear_layer.bias.data.zero_()
 
     def forward(self, h_j_dec, v_in):
@@ -51,8 +52,8 @@ class FNNMasker(nn.Module):
         :rtype: torch.autograd.variable.Variable
         """
         v_in_prime = v_in[:, self._context_length:-self._context_length, :]
-        m_j = self.relu(self.linear_layer(h_j_dec))
-        v_j_filt_prime = torch.mul(m_j, v_in_prime)
+        m_j = relu(self.linear_layer(h_j_dec))
+        v_j_filt_prime = m_j.mul(v_in_prime)
 
         return v_j_filt_prime
 

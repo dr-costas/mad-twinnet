@@ -4,13 +4,13 @@
 """The FNN enc and FNN dec of the Denoiser.
 """
 
-from torch import mul
 from torch.nn import Module, Linear
 from torch.nn.functional import relu
 from torch.nn.init import xavier_normal
 
-__author__ = 'Konstantinos Drossos -- TUT, Stylianos Mimilakis -- Fraunhofer IDMT'
+__author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
+__all__ = ['FNNDenoiser']
 
 
 class FNNDenoiser(Module):
@@ -50,7 +50,7 @@ class FNNDenoiser(Module):
         fnn_enc_output = relu(self.fnn_enc(v_j_filt_prime))
         fnn_dec_output = relu(self.fnn_dec(fnn_enc_output))
 
-        v_j_filt = mul(fnn_dec_output, v_j_filt_prime)
+        v_j_filt = fnn_dec_output.mul(v_j_filt_prime)
 
         return v_j_filt
 
