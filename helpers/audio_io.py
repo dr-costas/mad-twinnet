@@ -10,9 +10,6 @@ version of parts of the code that can be found at\
 `S. Mimilakis GitHub Repo <https://github.com/Js-Mim/mss_pytorch>`_.
 """
 
-import os
-import subprocess
-import sys
 import wave
 
 import numpy as np
@@ -20,12 +17,7 @@ from scipy.io.wavfile import write, read
 
 __author__ = ['Konstantinos Drossos -- TUT', 'Stelios Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
-__all__ = [
-    'audio_read',
-    'audio_write',
-    'wav_read',
-    'wav_write'
-]
+__all__ = ['wav_read', 'wav_write']
 
 _normFact = {
     'int8': (2 ** 7) - 1,
@@ -36,70 +28,6 @@ _normFact = {
     'float32': 1.0,
     'float64': 1.0
 }
-
-
-def audio_write(y, sampling_rate, nb_bits, file_name, file_format='wav'):
-    """Writes to disk an audio file from the audio data `y`.
-
-    This function write the audio data in `y` to an audio file according to the\
-    `sampling_rate` sampling rate, `nb_bits` number of bits, and \
-    `file_format` file format (i.e. extension).
-
-    :param y: The audio data.
-    :type y: numpy.core.multiarray.ndarray
-    :param sampling_rate: The sampling rate of the audio data.
-    :type sampling_rate: int
-    :param nb_bits: The number of bits of the audio data.
-    :type nb_bits: int
-    :param file_name: The resulting file name (without the extension).
-    :type file_name: str
-    :param file_format: The resulting format (i.e. the extension of the\
-                        resulting audio file).
-    :type file_format: str
-    """
-    _check_platform()
-
-    if file_format.startswith('.'):
-        file_format = file_format[1:]
-
-    _check_audio_file_format(file_format)
-
-    input_file_name = '{}.wav'.format(os.path.splitext(file_name)[0])
-    output_file_name = '{}.{}'.format(os.path.splitext(file_name)[0], file_format)
-    wav_write(y=y, sampling_rate=sampling_rate,
-              nb_bits=nb_bits, file_name=os.path.abspath(input_file_name))
-    _execute_ffmpeg_command(
-        input_file_name=input_file_name,
-        output_file_name=output_file_name
-    )
-    os.remove(input_file_name)
-
-
-def audio_read(file_name, mono=False):
-    """Reads the `file_name` audio file and returns its data and
-    its sampling rate.
-
-    :param file_name: The file name of the audio file.
-    :type file_name: str
-    :param mono: Indicate if the returned data should be mono or not.
-    :type mono: bool
-    :return: The data of the audio file and the sampling rate.
-    :rtype: (numpy.core.multiarray.ndarray, int)
-    """
-    _check_platform()
-    _check_audio_file_format(os.path.splitext(file_name)[-1])
-
-    output_file_name = '{}.wav'.format(os.path.splitext(file_name))
-
-    _execute_ffmpeg_command(
-        input_file_name=file_name,
-        output_file_name=output_file_name
-    )
-
-    samples, sample_rate = wav_read(os.path.abspath(output_file_name), mono)
-    os.remove(os.path.abspath(output_file_name))
-
-    return samples, sample_rate
 
 
 def wav_read(file_name, mono=False):
@@ -235,66 +163,5 @@ def _wav_to_array(nb_channels, sample_width, data):
         result = a.reshape(-1, nb_channels)
 
     return result
-
-
-def _execute_ffmpeg_command(input_file_name, output_file_name):
-    """Executes ffmpeg command.
-
-    This function is a helper one, used to as a shortcut for\
-    executing ffmpeg command. The ffmpeg command has as input\
-    the `input_file_name` file and as output the\
-    `output_file_name` file. Requires ffmpeg.
-
-    :param input_file_name: The input file name, extension included.
-    :type input_file_name: str
-    :param output_file_name: The output file name, extension included.
-    :type output_file_name: str
-    """
-    command_template = 'ffmpeg -i {the_input_file} {the_output_file}'
-
-    command_to_execute = command_template.format(
-        the_input_file=os.path.abspath(input_file_name),
-        the_output_file=os.path.abspath(output_file_name)
-    )
-
-    subprocess.call(
-        command_to_execute,
-        shell=True,
-        stdout=open(os.devnull, 'w'),
-        stderr=subprocess.STDOUT
-    )
-
-
-def _check_platform():
-    """Checks if the current platform is supported. If not,\
-    raises exception.
-
-    :raises SystemError: When the platform is not supported.
-    """
-    if sys.platform not in ['linux', 'linux2', 'darwin']:
-        raise SystemError('Not supported O.S.')
-
-
-def _check_audio_file_format(file_format):
-    """Checks if the specified `file_format` audio file\
-    format is supported. If not, raises exception.
-
-    :param file_format: The audio file format.
-    :type file_format: str
-    :raises AttributeError: When the `file_format` is not one of:
-                            - mp3
-                            - wav
-                            - wma
-                            - aiff
-                            - au
-                            - m4a
-    """
-    if file_format.startswith('.'):
-        file_format = file_format[1:]
-
-    if file_format not in ['mp3', 'wav', 'wma', 'aiff', 'au', 'm4a']:
-        raise AttributeError(
-            'The {} format is not supported.'.format(file_format)
-        )
 
 # EOF
