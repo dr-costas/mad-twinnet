@@ -14,6 +14,7 @@ Also, if you use any of the things existing in this repository, please consider 
 
 ##How do I use it ("Who cares about manuals" version)?
 You can:
+
 - re-train the MaD TwinNet, by running the script [training.py](scripts/training.py),
 - re-test it, by running the script [testing.py](scripts/testing.py), or 
 - use it, by running the script [use_me.py](scripts/use_me.py).
