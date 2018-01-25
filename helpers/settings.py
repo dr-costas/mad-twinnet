@@ -20,8 +20,11 @@ __all__ = [
     'testing_output_string_all',
     'training_constants',
     'wav_quality',
-    'hyper_parameters'
+    'hyper_parameters',
+    'usage_output_string_per_example',
+    'usage_output_string_total'
 ]
+
 
 debug = False
 _debug_suffix = '_debug' if debug else ''
@@ -62,8 +65,8 @@ output_audio_paths = {
 }
 
 metrics_paths = {
-    'sdr': os.path.join(_metrics_path, 'sdr{}.pckl'.format(_debug_suffix)),
-    'sir': os.path.join(_metrics_path, 'sir{}.pckl'.format(_debug_suffix))
+    'sdr': os.path.join(_metrics_path, 'sdr{}_p2.pckl'.format(_debug_suffix)),
+    'sir': os.path.join(_metrics_path, 'sir{}_p2.pckl'.format(_debug_suffix))
 }
 
 output_states_path = {
@@ -86,6 +89,9 @@ testing_output_string_per_example = 'Example: {e:2d}, Median -- ' \
 testing_output_string_all = 'Median SDR:{sdr:6.2f} dB | ' \
                             'Median SIR:{sir:6.2f} dB | ' \
                             'Total time:{t:6.2f} sec(s)'
+
+usage_output_string_per_example = '-- File {f} processed. Time: {t:6.2f} sec(s)'
+usage_output_string_total = '-- All files processed. Total time: {t:6.2f} sec(s)'
 
 # Process constants
 training_constants = {

@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Testing process module.
+"""Usage script.
 """
 
 from __future__ import print_function
 
-import pickle
+import argparse
+import os
 import time
 
 import numpy as np
@@ -15,20 +16,29 @@ from torch.autograd import Variable
 
 from helpers.data_feeder import data_feeder_testing, data_process_results_testing
 from helpers.settings import debug, hyper_parameters, output_states_path, training_constants, \
-    testing_output_string_per_example, metrics_paths, testing_output_string_all
+    usage_output_string_per_example, usage_output_string_total
 from modules import RNNEnc, RNNDec, FNNMasker, FNNDenoiser
 
 __author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
-__all__ = ['testing_process']
+__all__ = ['use_me_process']
 
 
-def testing_process():
-    """The testing process.
+def use_me_process(sources_list, output_file_names):
+    """The usage process.
+
+    :param sources_list: The file names to be used.
+    :type sources_list: list[str]
+    :param output_file_names: The output file names to be used.
+    :type output_file_names: list[list[str]]
     """
 
-    print('\n-- Starting testing process. Debug mode: {}.'.format(debug))
-    print('-- Setting up modules... ', end='')
+    print('\n-- Welcome to MaD TwinNet.')
+    if debug:
+        print('\n-- Cannot proceed in debug mode. Please set debug=False at the settings file.')
+        print('-- Exiting.')
+        exit(-1)
+    print('-- Now I will extract the voice and the background music from the provided files')
 
     # Masker modules
     rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length'], debug)
@@ -53,19 +63,14 @@ def testing_process():
         fnn = fnn.cuda()
         denoiser = denoiser.cuda()
 
-    print('done.')
-
     testing_it = data_feeder_testing(
         window_size=hyper_parameters['window_size'], fft_size=hyper_parameters['fft_size'],
         hop_size=hyper_parameters['hop_size'], seq_length=hyper_parameters['seq_length'],
         context_length=hyper_parameters['context_length'], batch_size=1,
-        debug=debug
+        debug=debug, sources_list=sources_list
     )
 
-    print('-- Testing starts\n')
-
-    sdr = []
-    sir = []
+    print('-- Let\'s go!\n')
     total_time = 0
 
     for index, data in enumerate(testing_it()):
@@ -99,49 +104,96 @@ def testing_process():
 
             voice_predicted[b_start:b_end, :, :] = tmp_voice_predicted.data.cpu().numpy()
 
-        tmp_sdr, tmp_sir = data_process_results_testing(
+        data_process_results_testing(
             index=index, voice_true=voice_true, bg_true=bg_true,
             voice_predicted=voice_predicted,
             window_size=hyper_parameters['window_size'], mix=mix, mix_magnitude=mix_magnitude,
             mix_phase=mix_phase, hop=hyper_parameters['hop_size'],
-            context_length=hyper_parameters['context_length']
+            context_length=hyper_parameters['context_length'],
+            output_file_name=output_file_names[index]
         )
 
         e_time = time.time()
 
-        print(testing_output_string_per_example.format(
-            e=index,
-            sdr=np.median([i for i in tmp_sdr[0] if not np.isnan(i)]),
-            sir=np.median([i for i in tmp_sir[0] if not np.isnan(i)]),
+        print(usage_output_string_per_example.format(
+            f=sources_list[index],
             t=e_time - s_time
         ))
 
         total_time += e_time - s_time
 
-        sdr.append(tmp_sdr)
-        sir.append(tmp_sir)
-
     print('\n-- Testing finished\n')
-    print(testing_output_string_all.format(
-        sdr=np.median([ii for i in sdr for ii in i[0] if not np.isnan(ii)]),
-        sir=np.median([ii for i in sir for ii in i[0] if not np.isnan(ii)]),
+    print(usage_output_string_total.format(
         t=total_time
     ))
-
-    print('\n-- Saving results... ', end='')
-
-    with open(metrics_paths['sdr'], 'wb') as f:
-        pickle.dump(sdr, f, protocol=2)
-
-    with open(metrics_paths['sir'], 'wb') as f:
-        pickle.dump(sir, f, protocol=2)
-
-    print('done!')
     print('-- That\'s all folks!')
 
 
+def _make_target_file_names(sources_list):
+    """Makes the target file names for the sources list.
+
+    :param sources_list: The sources list.
+    :type sources_list: list[str]
+    :return: The target names.
+    :rtype: list[list[str]]
+    """
+    targets_list = []
+
+    for source in sources_list:
+        f_name = os.path.splitext(source)[0]
+        targets_list.append(['{}_voice.wav'.format(f_name), '{}_bg_music.wav'.format(f_name)])
+
+    return targets_list
+
+
+def _get_file_names_from_file(file_name):
+    """Reads line by line a txt file and returns the contents.
+
+    :param file_name: The file name of the txt file.
+    :type file_name: str
+    :return: The contents of the file, in a line-by-line fashion.
+    :rtype: list[str]
+    """
+    with open(file_name) as f:
+        return [line.strip() for line in f.readlines()]
+
+
 def main():
-    testing_process()
+    cmd_arg_parser = argparse.ArgumentParser(
+        usage='python scripts/use_me [-iw the_file.wav]|[-il the_files.txt]',
+        description='Script to use the MaD TwinNet with your own files. Remember to set up properly'
+                    'the PYTHONPATH environmental variable'
+    )
+
+    cmd_arg_parser.add_argument(
+        '--input-wav', '-iw', action='store', dest='input_wav', default='',
+        help='Specify one wav file to be processed.'
+    )
+
+    cmd_arg_parser.add_argument(
+        '--input-list', '-il', action='store', dest='input_list', default=[],
+        help='Specify one txt file with each line to be one path for a wav file.'
+    )
+
+    cmd_args = cmd_arg_parser.parse_args()
+    input_wav = cmd_args.input_wav
+    input_list = cmd_args.input_list
+
+    if (input_wav == '' and len(input_list) == 0) or (input_wav != '' and len(input_list) != 0):
+        print('-- Please specify **either** a wav file (with -iw) **or** give'
+              'a txt file with file names in each line (with -il). ')
+        print('-- Exiting.')
+        exit(-1)
+
+    if len(input_list) == 0:
+        input_list = [input_wav]
+    else:
+        input_list = _get_file_names_from_file(input_list)
+
+    use_me_process(
+        sources_list=input_list,
+        output_file_names=_make_target_file_names(input_list)
+    )
 
 
 if __name__ == '__main__':
