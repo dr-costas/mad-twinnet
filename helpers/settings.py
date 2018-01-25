@@ -23,7 +23,7 @@ __all__ = [
     'hyper_parameters'
 ]
 
-debug = True
+debug = False
 _debug_suffix = '_debug' if debug else ''
 
 # Paths
@@ -41,19 +41,24 @@ dataset_paths = {
 output_audio_paths = {
     'voice_true': os.path.join(
         _audio_files_path,
-        'test_example_{p:02d}_voice_true{d}.wav'.format(d=_debug_suffix)),
+        'test_example_{placeholder}_voice_true{d}.wav'.format(
+            placeholder='{p:02d}', d=_debug_suffix)),
     'voice_predicted': os.path.join(
         _audio_files_path,
-        'test_example_{p:02d}_voice_predicted{d}.wav'.format(d=_debug_suffix)),
+        'test_example_{placeholder}_voice_predicted{d}.wav'.format(
+            placeholder='{p:02d}', d=_debug_suffix)),
     'bg_true': os.path.join(
         _audio_files_path,
-        'test_example_{p:02d}_bg_true{d}.wav'.format(d=_debug_suffix)),
+        'test_example_{placeholder}_bg_true{d}.wav'.format(
+            placeholder='{p:02d}', d=_debug_suffix)),
     'bg_predicted': os.path.join(
         _audio_files_path,
-        'test_example_{p:02d}_bg_predicted{d}.wav'.format(d=_debug_suffix)),
+        'test_example_{placeholder}_bg_predicted{d}.wav'.format(
+            placeholder='{p:02d}', d=_debug_suffix)),
     'mix': os.path.join(
         _audio_files_path,
-        'test_example_{p:02d}_mix_true{d}.wav'.format(d=_debug_suffix))
+        'test_example_{placeholder}_mix_true{d}.wav'.format(
+            placeholder='{p:02d}', d=_debug_suffix))
 }
 
 metrics_paths = {
@@ -69,16 +74,18 @@ output_states_path = {
 }
 
 # Strings
-training_output_string = 'Epoch: {ep:3d} Losses: -- Masker: {l_m:.4f} | ' \
-                         'Denoiser: {l_d:.4f} | Twin: {l_tw:.4f} | ' \
-                         'Twin reg.: {l_twin:.4f} | Time: {t:.2f} sec(s)'
+training_output_string = 'Epoch: {ep:3d} Losses: -- ' \
+                         'Masker:{l_m:6.4f} | Denoiser:{l_d:6.4f} | ' \
+                         'Twin:{l_tw:6.4f} | Twin reg.:{l_twin:6.4f} | ' \
+                         'Time:{t:6.2f} sec(s)'
 
-testing_output_string_per_example = 'Example: {e:2d}, Median -- SDR {sdr:.2f} dB | ' \
-                                    'SIR {sir:.2f} dB | Time: {t:.2f} sec(s)'
+testing_output_string_per_example = 'Example: {e:2d}, Median -- ' \
+                                    'SDR:{sdr:6.2f} dB | SIR:{sir:6.2f} dB | ' \
+                                    'Time:{t:6.2f} sec(s)'
 
-testing_output_string_all = 'Median SDR: {sdr:.2f} dB | ' \
-                            'Median SIR: {sir:.2f} dB | ' \
-                            'Total time: {t:.2f} sec(s)'
+testing_output_string_all = 'Median SDR:{sdr:6.2f} dB | ' \
+                            'Median SIR:{sir:6.2f} dB | ' \
+                            'Total time:{t:6.2f} sec(s)'
 
 # Process constants
 training_constants = {
@@ -102,7 +109,7 @@ hyper_parameters = {
     'max_grad_norm': .5,
     'lambda_l_twin': .5,
     'lambda_1': 1e-2,
-    'lambda_2': 1e-4,
+    'lambda_2': 1e-4
 }
 hyper_parameters.update({
     'rnn_enc_output_dim': 2 * hyper_parameters['reduced_dim']

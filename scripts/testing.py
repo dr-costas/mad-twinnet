@@ -12,7 +12,7 @@ import torch
 from torch.autograd import Variable
 
 from helpers.data_feeder import data_feeder_testing, data_process_results_testing
-from helpers.settings import debug, hyper_parameters, output_states_path, \
+from helpers.settings import debug, hyper_parameters, output_states_path, training_constants, \
     testing_output_string_per_example, metrics_paths, testing_output_string_all
 from modules import RNNEnc, RNNDec, FNNMasker, FNNDenoiser
 
@@ -81,9 +81,9 @@ def testing_process():
             dtype=np.float32
         )
 
-        for batch in range(int(mix_magnitude.shape[0] / hyper_parameters['batch_size'])):
-            b_start = batch * hyper_parameters['batch_size']
-            b_end = (batch + 1) * hyper_parameters['batch_size']
+        for batch in range(int(mix_magnitude.shape[0] / training_constants['batch_size'])):
+            b_start = batch * training_constants['batch_size']
+            b_end = (batch + 1) * training_constants['batch_size']
 
             v_in = Variable(torch.from_numpy(mix_magnitude[b_start:b_end, :, :]))
 
@@ -109,8 +109,8 @@ def testing_process():
 
         print(testing_output_string_per_example.format(
             e=index,
-            sdr=[i for i in tmp_sdr[0] if not np.isnan(i)],
-            sir=[i for i in tmp_sir[0] if not np.isnan(i)],
+            sdr=np.median([i for i in tmp_sdr[0] if not np.isnan(i)]),
+            sir=np.median([i for i in tmp_sir[0] if not np.isnan(i)]),
             t=e_time - s_time
         ))
 
@@ -135,7 +135,7 @@ def testing_process():
         pickle.dump(sir, f, protocol=2)
 
     print('done!')
-    print('That\'s all folks!')
+    print('-- That\'s all folks!')
 
 
 def main():

@@ -31,7 +31,7 @@ class RNNEnc(Module):
         self._input_dim = input_dim
         self._context_length = context_length
 
-        self.gur_enc_f = GRUCell(self._input_dim, self._input_dim)
+        self.gru_enc_f = GRUCell(self._input_dim, self._input_dim)
         self.gru_enc_b = GRUCell(self._input_dim, self._input_dim)
 
         self._debug = debug
@@ -41,11 +41,11 @@ class RNNEnc(Module):
     def initialize_encoder(self):
         """Manual weight/bias initialization.
         """
-        xavier_normal(self.gur_enc_f.weight_ih)
-        orthogonal(self.gur_enc_f.weight_hh)
+        xavier_normal(self.gru_enc_f.weight_ih)
+        orthogonal(self.gru_enc_f.weight_hh)
 
-        self.gur_enc_f.bias_ih.data.zero_()
-        self.gur_enc_f.bias_hh.data.zero_()
+        self.gru_enc_f.bias_ih.data.zero_()
+        self.gru_enc_f.bias_hh.data.zero_()
 
         xavier_normal(self.gru_enc_b.weight_ih)
         orthogonal(self.gru_enc_b.weight_hh)
@@ -79,7 +79,7 @@ class RNNEnc(Module):
             h_enc = h_enc.cuda()
 
         for t in range(seq_length):
-            h_t_f = self.gur_enc_f((v_tr[:, t, :]), h_t_f)
+            h_t_f = self.gru_enc_f((v_tr[:, t, :]), h_t_f)
             h_t_b = self.gru_enc_b((v_tr[:, seq_length - t - 1, :]), h_t_b)
 
             if self._context_length <= t < seq_length - self._context_length:
