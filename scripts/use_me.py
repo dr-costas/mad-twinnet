@@ -160,18 +160,18 @@ def _get_file_names_from_file(file_name):
 
 def main():
     cmd_arg_parser = argparse.ArgumentParser(
-        usage='python scripts/use_me [-iw the_file.wav]|[-il the_files.txt]',
+        usage='python scripts/use_me [-w the_file.wav]|[-l the_files.txt]',
         description='Script to use the MaD TwinNet with your own files. Remember to set up properly'
                     'the PYTHONPATH environmental variable'
     )
 
     cmd_arg_parser.add_argument(
-        '--input-wav', '-iw', action='store', dest='input_wav', default='',
+        '--input-wav', '-w', action='store', dest='input_wav', default='',
         help='Specify one wav file to be processed.'
     )
 
     cmd_arg_parser.add_argument(
-        '--input-list', '-il', action='store', dest='input_list', default=[],
+        '--input-list', '-l', action='store', dest='input_list', default=[],
         help='Specify one txt file with each line to be one path for a wav file.'
     )
 
