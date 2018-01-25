@@ -14,7 +14,7 @@ from helpers.data_feeder import data_feeder_training
 from helpers.settings import debug, hyper_parameters, training_constants, \
     training_output_string, output_states_path
 from modules import RNNEnc, RNNDec, FNNMasker, FNNDenoiser, AffineTransform
-from objectives import kullback_leibler as kl, l2_loss, sparsity_penalty, l2_reg
+from objectives import kullback_leibler as kl, l2_loss, sparsity_penalty, l2_reg_squared
 
 __author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
@@ -66,7 +66,7 @@ def training_process():
     loss_twin = kl
     reg_twin = l2_loss
     reg_fnn_masker = sparsity_penalty
-    reg_fnn_dec = l2_reg
+    reg_fnn_dec = l2_reg_squared
 
     # Optimizer
     optimizer = optim.Adam(

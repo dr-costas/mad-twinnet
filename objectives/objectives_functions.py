@@ -6,7 +6,7 @@
 
 __author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
-__all__ = ['kullback_leibler', 'l2_loss', 'sparsity_penalty', 'l2_reg']
+__all__ = ['kullback_leibler', 'l2_loss', 'sparsity_penalty', 'l2_reg_squared']
 
 
 def kullback_leibler(y_hat, y):
@@ -48,7 +48,7 @@ def sparsity_penalty(weight_matrix):
     return weight_matrix.data.diag().abs().sum()
 
 
-def l2_reg(weight_matrix):
+def l2_reg_squared(weight_matrix):
     """Calculates the L2 regularization value for a weight matrix.
 
     :param weight_matrix: The weight matrix.
