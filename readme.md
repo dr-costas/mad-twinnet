@@ -117,6 +117,24 @@ the one from the DSD, or
 For the second option, you will have to at least modify the 
 `_get_files_lists` function, in the `helpers` directory/package.
 
+
+###Using the pre-trained weights
+To use the pre-trained weights of the MaD TwinNet, first you have
+to obtain them from [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592)
+.
+
+Then, you have to unzip the obtained .zip file and move the resulting
+files in the `outputs/states/` directory. These files will be the
+following:
+- rnn_enc.pt
+- rnn_dec.pt
+- fnn.pt
+- denoiser.pt
+
+You **must not** alter the names of the files and these files
+cannot be used if you alter any members of the classes used
+in the `modules/` directory. 
+
 ###Re-training MaD TwinNet
 You can re-train the MaD TwinNet. For example, you might want to 
 try and find better hyper-parameters, try how the MaD TwinNet will
@@ -141,9 +159,7 @@ the values that you will use are correct and can actually be used.
 
 ###Re-testing MaD TwinNet
 You can re-test the MaD TwinNet. To do so, you need again the proper
-set-up of the dataset and the weights of the MaD TwinNet. You can
-get the weights from [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592)
-.
+set-up of the dataset and the weights of the MaD TwinNet. 
 
 When the above are OK, then you simply run the `scripts/testing.py`
 file. 
