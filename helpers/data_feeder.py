@@ -20,7 +20,7 @@ __author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer 
 __docformat__ = 'reStructuredText'
 __all__ = ['data_feeder_training', 'data_feeder_testing', 'data_process_results_testing']
 
-_get_me_sdr_and_sir = itemgetter(0, 2)
+_get_me_the_metrics = itemgetter(0, 2)
 
 
 def data_feeder_training(window_size, fft_size, hop_size, seq_length, context_length,
@@ -198,7 +198,7 @@ def data_process_results_testing(index, voice_true, bg_true, voice_predicted,
         wav_write(mix, file_name=output_audio_paths['mix'].format(p=example_index), **wav_quality)
 
         # Metrics calculation
-        sdr, sir = _get_me_sdr_and_sir(bss_eval.bss_eval_images_framewise(
+        sdr, sir = _get_me_the_metrics(bss_eval.bss_eval_images_framewise(
             [voice_true[:min_len], bg_true[:min_len]],
             [voice_hat[:min_len], bg_hat[:min_len]]
         ))
