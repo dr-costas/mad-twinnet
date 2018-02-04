@@ -171,4 +171,28 @@ in the project root directory, you can issue the command
 command `python scripts/testing.py`.
 
 ###Use MaD TwinNet
+To use the MaD TwinNet you need to have set up the pre-trained weights. 
+If these weights are properly set up, then you need to call the script
+`scripts/use_me.py` and provide as an argument:
+- either a single file, or
+- a text file (i.e. with ending .txt) which will have the path
+to a single wav file in each line. 
 
+The script will extract the voice and the background music from the provided
+arguments (i.e. either the single wav file or all the wav files from the 
+.txt file) and will save it as .wav file at the same position where the
+corresponding wav file is. 
+
+**Note bold:** All wav files must be 44.1 kHz sampling frequency and 16 bits
+sample width (a.k.a. standard CD quality). 
+
+Example of using the MaD TwinNet: 
+
+`python scripts/use_me.py -w my_wav_file.wav`
+
+or 
+
+`python scripts/use_me.py -l a_txt_file_with_wavs.txt`
+
+Please remember to set properly the python path 
+(e.g. `export PYTHONPATH=$PYTHONPATH:../`)!
