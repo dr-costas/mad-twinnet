@@ -102,7 +102,7 @@ testing sets must be `dataset/Dev` and `dataset/Test`, respectively.
 Also, by default, you will need numbered file names (e.g. `001.wav`)
 and each file name should have an identifier whether the file is about
 the mixture, the voice, the bass, and other. **Please check the 
-[Demixing Secret Dataset (DSD)]()
+[Demixing Secret Dataset (DSD)](http://www.sisec17.audiolabs-erlangen.de)
 for the exact file naming conventions.** 
 
 If you want to use the DSD, then you most probably will want to 
