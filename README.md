@@ -1,6 +1,6 @@
 # MaD TwinNet GitHub Repository
 
-#####Welcome to the repository of the MaD TwinNet. 
+### Welcome to the repository of the MaD TwinNet. 
 
 If you know what you are doing, then jump ahead, get the **_pre-trained
 weights_** from 
@@ -17,7 +17,7 @@ the MaD TwinNet](http://arg.cs.tut.fi/demo/mad-twinnet).
 If you need some help on using MaD TwinNet, please read the following
 instructions. 
 
-##Important!
+## Important!
 Before you read anything else here, please make sure that you 
 checked the licencing of this code. 
 
@@ -26,14 +26,14 @@ or the associated binary files from Zenodo, please consider
 citing our paper available
 [from here](https://arxiv.org/abs/1802.00300). 
 
-##Table of contents
+## Table of contents
 
 - [How do I use it with no manual](mad-twinnet#How do I use it with no manual)
 - [What is the MaD TwinNet](mad-twinnet#What is the MaD TwinNet)
 - [How do I use the MaD TwinNet](mad-twinnet#How do I use the MaD TwinNet)
 - [Acknowledgements](mad-twinnet#Acknowledgements)
 
-##How do I use it with no manual
+## How do I use it with no manual
 You can:
 
 - re-train the MaD TwinNet, by running the script
@@ -54,7 +54,7 @@ pre-trained weights from
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592)
 .  
 
-##What is the MaD TwinNet
+## What is the MaD TwinNet
 MaD TwinNet stands for the "Masker-Denoiser with Twin Networks
 architecture/method" for monaural music sound source separation. 
 An illustration of the MaD TwinNet can be seen in the following 
@@ -67,8 +67,8 @@ You can read more at [our paper on arXiv](https://arxiv.org/abs/1802.00300).
 For the implementation of our method, we used the
 [PyTorch framework](http://pytorch.org). 
 
-##How do I use the MaD TwinNet
-###Setting up the environment
+## How do I use the MaD TwinNet
+### Setting up the environment
 Before starting using the code of this repository, you will have to
 install some packages for your python environment. 
 
@@ -92,7 +92,7 @@ If you want to **use the `anaconda`/`conda`**, then you have to
 - issue at your terminal the command 
 `conda install --yes --file conda_requirements.txt`
 
-###Dataset set-up
+### Dataset set-up
 To do so, you will have to obtain your dataset. Your dataset should
 be in the `dataset` directory. By default, the training set should
 be under a directory named `Dev` and the testing set under a directory
@@ -118,7 +118,7 @@ For the second option, you will have to at least modify the
 `_get_files_lists` function, in the `helpers` directory/package.
 
 
-###Using the pre-trained weights
+### Using the pre-trained weights
 To use the pre-trained weights of the MaD TwinNet, first you have
 to obtain them from [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592)
 .
@@ -135,7 +135,7 @@ You **must not** alter the names of the files and these files
 cannot be used if you alter any members of the classes used
 in the `modules/` directory. 
 
-###Re-training MaD TwinNet
+### Re-training MaD TwinNet
 You can re-train the MaD TwinNet. For example, you might want to 
 try and find better hyper-parameters, try how the MaD TwinNet will
 go on a different training dataset, or any other wonderful idea :)
@@ -151,13 +151,13 @@ in the project root directory, you can issue the command
 `export PYTHONPATH=$PYTHONPATH:../` and then you can issue the 
 command `python scripts/training.py`. 
 
-####Altering the hyper-parameters
+### Altering the hyper-parameters
 All the hyper-parameters are in the `helpers/settings.py` file. 
 
 You can alter any hyper-parameter you want, but make sure that 
 the values that you will use are correct and can actually be used. 
 
-###Re-testing MaD TwinNet
+### Re-testing MaD TwinNet
 You can re-test the MaD TwinNet. To do so, you need again the proper
 set-up of the dataset and the weights of the MaD TwinNet. 
 
@@ -170,7 +170,7 @@ in the project root directory, you can issue the command
 `export PYTHONPATH=$PYTHONPATH:../` and then you can issue the 
 command `python scripts/testing.py`.
 
-###Use MaD TwinNet
+### Use MaD TwinNet
 To use the MaD TwinNet you need to have set up the pre-trained weights. 
 If these weights are properly set up, then you need to call the script
 `scripts/use_me.py` and provide as an argument:
