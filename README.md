@@ -28,10 +28,10 @@ citing our paper available
 
 ## Table of contents
 
-- [How do I use it with no manual](mad-twinnet#How do I use it with no manual)
-- [What is the MaD TwinNet](mad-twinnet#What is the MaD TwinNet)
-- [How do I use the MaD TwinNet](mad-twinnet#How do I use the MaD TwinNet)
-- [Acknowledgements](mad-twinnet#Acknowledgements)
+- <a href='#how-do-i-use-it-with-no-manual'>How do I use it with no manual</a>
+- <a href='#what-is-the-mad-twinnet'>What is the MaD TwinNet</a>
+- <a href='#how-do-i-use-the-mad-twinnet'>How do I use the MaD TwinNet</a>
+- <a href='#acknowledgements'>Acknowledgements</a>
 
 ## How do I use it with no manual
 You can:
@@ -196,3 +196,17 @@ or
 
 Please remember to set properly the python path 
 (e.g. `export PYTHONPATH=$PYTHONPATH:../`)!
+
+## Acknowledgements
+
+- Part of the computations leading to these results was performed  on  a  TITAN-X 
+GPU  donated  by  NVIDIA  to  K. Drossos.
+- K.  Drossos  and  T.  Virtanen  wish  to  acknowledge  CSC-IT  Center  for  Science, 
+Finland,  for  computational  resources.
+- D. Serdyuk  would  like  to  acknowledge the support of the following agencies for 
+research funding and computing support: Samsung, NSERC, Calcul Quebec, Compute Canada,
+the  Canada  Research  Chairs,  and  CIFAR.
+- S.-I. Mimilakis is supported by the European Union’s H2020  Framework  Programme
+(H2020-MSCA-ITN-2014) under grant agreement no 642685 MacSeNet.
+- The authors would like to thank P. Magron and G. Naithani (TUT, Finland) for their 
+valuable comments and feedback during the writing process.
