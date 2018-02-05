@@ -8,7 +8,7 @@ weights_** from
 and start using the MaD TwinNet.  
 
 If you just need the **_results_**, you can get them from
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164585.svg)](https://doi.org/10.5281/zenodo.1164585)
 .
 
 There is also an on-line demo of the MaD TwinNet at the [website of
