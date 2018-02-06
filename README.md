@@ -30,15 +30,15 @@ citing our paper available
 You can:
 
 - re-train the MaD TwinNet, by running the script
-[training.py](scripts/training.py),
+[training.py](https://arg-redmine.tut.fi/projects/mad-twinnet/repository/revisions/master/entry/scripts/training.py),
 - re-test it, by running the script 
-[testing.py](scripts/testing.py), or 
+[testing.py](https://arg-redmine.tut.fi/projects/mad-twinnet/repository/revisions/master/entry/scripts/testing.py), or 
 - use it, by running the script 
-[use_me.py](scripts/use_me.py).
+[use_me.py](https://arg-redmine.tut.fi/projects/mad-twinnet/repository/revisions/master/entry/scripts/use_me.py).
 
 The settings for all the above processes are controller by 
-the [settings.py](helpers/settings.py) file. For the 
-[use_me.py](scripts/use_me.py) script, you can find directions
+the [settings.py](https://arg-redmine.tut.fi/projects/mad-twinnet/repository/revisions/master/entry/helpers/settings.py) file. For the 
+[use_me.py](https://arg-redmine.tut.fi/projects/mad-twinnet/repository/revisions/master/entry/scripts/use_me.py) script, you can find directions
 in it or go to the How do I use it (RTFM version)? section.
 
 If you want to re-test or use the MaD TwinNet, you will need 
