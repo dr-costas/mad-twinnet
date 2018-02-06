@@ -1,4 +1,4 @@
-# MaD TwinNet GitHub Repository
+# MaD TwinNet Audio Research Group Repository
 
 ### Welcome to the repository of the MaD TwinNet. 
 
