@@ -24,14 +24,7 @@ checked the licencing of this code.
 Also, if you use any of the things existing in this repository
 or the associated binary files from Zenodo, please consider 
 citing our paper available
-[from here](https://arxiv.org/abs/1802.00300). 
-
-## Table of contents
-
-- <a href='#how-do-i-use-it-with-no-manual'>How do I use it with no manual</a>
-- <a href='#what-is-the-mad-twinnet'>What is the MaD TwinNet</a>
-- <a href='#how-do-i-use-the-mad-twinnet'>How do I use the MaD TwinNet</a>
-- <a href='#acknowledgements'>Acknowledgements</a>
+[from here](https://arxiv.org/abs/1802.00300).
 
 ## How do I use it with no manual
 You can:
