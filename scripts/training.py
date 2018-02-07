@@ -79,7 +79,7 @@ def training_process():
         list(twin_net_rnn_dec.parameters()) +
         list(twin_net_fnn_masker.parameters()) +
         list(affine_transform.parameters()),
-        lr=hyper_parameters['hyper_parameters']
+        lr=hyper_parameters['learning_rate']
     )
 
     print('done.')
