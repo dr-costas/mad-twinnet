@@ -17,10 +17,6 @@ the MaD TwinNet](http://arg.cs.tut.fi/demo/mad-twinnet).
 If you need some help on using MaD TwinNet, please read the following
 instructions. 
 
-## Important!
-Before you read anything else here, please make sure that you 
-checked the licencing of this code. 
-
 Also, if you use any of the things existing in this repository
 or the associated binary files from Zenodo, please consider 
 citing our paper available
