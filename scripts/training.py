@@ -140,7 +140,7 @@ def training_process():
             l_twin = reg_twin(affine_output, h_dec_twin)
 
             # Make MaD TwinNet objective
-            loss = l_m + l_d + l_tw + (hyper_parameters['lambda_l_twin '] * l_twin) + \
+            loss = l_m + l_d + l_tw + (hyper_parameters['lambda_l_twin'] * l_twin) + \
                    (hyper_parameters['lambda_1'] * reg_fnn_masker(fnn.linear_layer.weight)) + \
                    (hyper_parameters['lambda_2'] * reg_fnn_dec(denoiser.fnn_dec.weight))
 
