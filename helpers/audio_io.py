@@ -58,10 +58,12 @@ def wav_read(file_name, mono=False):
         # 32 bit case
         samples, sample_rate = _load_wav_with_scipy(file_name)
 
+    if samples.shape[1] == 1:
+        samples = samples.squeeze(-1)
+
     # mono conversion
-    if mono:
-        if samples.ndim == 2 and samples.shape[1] > 1:
-            samples = (samples[:, 0] + samples[:, 1]) * 0.5
+    if mono and samples.ndim == 2:
+        samples = (samples[:, 0] + samples[:, 1]) * 0.5
 
     return samples, sample_rate
 
