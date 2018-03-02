@@ -137,7 +137,7 @@ def training_process():
             l_m = loss_masker(v_j_filt_prime, v_j)
             l_d = loss_denoiser(v_j_filt, v_j)
             l_tw = loss_twin(v_j_filt_prime_twin, v_j)
-            l_twin = reg_twin(affine_output, h_dec_twin)
+            l_twin = reg_twin(affine_output, h_dec_twin.detach())
 
             # Make MaD TwinNet objective
             loss = l_m + l_d + l_tw + (hyper_parameters['lambda_l_twin'] * l_twin) + \
