@@ -79,7 +79,7 @@ def training_process():
         list(twin_net_rnn_dec.parameters()) +
         list(twin_net_fnn_masker.parameters()) +
         list(affine_transform.parameters()),
-        lr=hyper_parameters['hyper_parameters']
+        lr=hyper_parameters['learning_rate']
     )
 
     print('done.')
@@ -137,10 +137,10 @@ def training_process():
             l_m = loss_masker(v_j_filt_prime, v_j)
             l_d = loss_denoiser(v_j_filt, v_j)
             l_tw = loss_twin(v_j_filt_prime_twin, v_j)
-            l_twin = reg_twin(affine_output, h_dec_twin)
+            l_twin = reg_twin(affine_output, h_dec_twin.detach())
 
             # Make MaD TwinNet objective
-            loss = l_m + l_d + l_tw + (hyper_parameters['lambda_l_twin '] * l_twin) + \
+            loss = l_m + l_d + l_tw + (hyper_parameters['lambda_l_twin'] * l_twin) + \
                    (hyper_parameters['lambda_1'] * reg_fnn_masker(fnn.linear_layer.weight)) + \
                    (hyper_parameters['lambda_2'] * reg_fnn_dec(denoiser.fnn_dec.weight))
 

@@ -180,8 +180,8 @@ def main():
     input_list = cmd_args.input_list
 
     if (input_wav == '' and len(input_list) == 0) or (input_wav != '' and len(input_list) != 0):
-        print('-- Please specify **either** a wav file (with -iw) **or** give'
-              'a txt file with file names in each line (with -il). ')
+        print('-- Please specify **either** a wav file (with -w) **or** give'
+              'a txt file with file names in each line (with -l). ')
         print('-- Exiting.')
         exit(-1)
 
