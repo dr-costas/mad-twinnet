@@ -187,9 +187,6 @@ def training_process():
     torch.save(rnn_dec.state_dict(), output_states_path['rnn_dec'])
     torch.save(fnn.state_dict(), output_states_path['fnn'])
     torch.save(denoiser.state_dict(), output_states_path['denoiser'])
-    torch.save(twin_net_rnn_dec.state_dict(), output_states_path['twin_rnn_dec'])
-    torch.save(twin_net_fnn_masker.state_dict(), output_states_path['twin_fnn'])
-    torch.save(affine_transform.state_dict(), output_states_path['affine_transform'])
     print('done.')
     print('-- That\'s all folks!')
 

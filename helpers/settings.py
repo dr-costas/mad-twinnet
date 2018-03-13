@@ -73,7 +73,7 @@ output_states_path = {
     'rnn_enc': os.path.join(_states_path, 'rnn_enc{}.pt'.format(_debug_suffix)),
     'rnn_dec': os.path.join(_states_path, 'rnn_dec{}.pt'.format(_debug_suffix)),
     'fnn': os.path.join(_states_path, 'fnn{}.pt'.format(_debug_suffix)),
-    'denoiser': os.path.join(_states_path, 'denoiser{}.pt'.format(_debug_suffix)),
+    'denoiser': os.path.join(_states_path, 'denoiser{}.pt'.format(_debug_suffix))
 }
 
 # Strings
