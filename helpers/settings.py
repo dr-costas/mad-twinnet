@@ -100,7 +100,7 @@ training_constants = {
     'files_per_pass': 4
 }
 
-wav_quality = {'sampling_rate': 44100, 'nb_bits': 16}
+wav_quality = {'sampling_rate': 8000, 'nb_bits': 8}
 
 # Hyper-parameters
 hyper_parameters = {
