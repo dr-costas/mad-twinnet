@@ -15,7 +15,7 @@ from torch.autograd import Variable
 from helpers.data_feeder import data_feeder_training
 from helpers.settings import debug, hyper_parameters, training_constants, \
     training_output_string, output_states_path
-from modules import RNNEnc, RNNDec, FNNMasker, FNNDenoiser, AffineTransform
+from modules import RNNEnc, RNNDec, FNNMasker, FNNDenoiser, TwinRNNDec, AffineTransform
 from objectives import kullback_leibler as kl, l2_loss, sparsity_penalty, l2_reg_squared
 
 __author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
@@ -42,7 +42,7 @@ def training_process():
     denoiser = FNNDenoiser(hyper_parameters['original_input_dim'])
 
     # TwinNet regularization modules
-    twin_net_rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim'], debug)
+    twin_net_rnn_dec = TwinRNNDec(hyper_parameters['rnn_enc_output_dim'], debug)
     twin_net_fnn_masker = FNNMasker(
         hyper_parameters['rnn_enc_output_dim'],
         hyper_parameters['original_input_dim'],
@@ -187,6 +187,9 @@ def training_process():
     torch.save(rnn_dec.state_dict(), output_states_path['rnn_dec'])
     torch.save(fnn.state_dict(), output_states_path['fnn'])
     torch.save(denoiser.state_dict(), output_states_path['denoiser'])
+    torch.save(twin_net_rnn_dec.state_dict(), output_states_path['twin_rnn_dec'])
+    torch.save(twin_net_fnn_masker.state_dict(), output_states_path['twin_fnn'])
+    torch.save(affine_transform.state_dict(), output_states_path['affine_transform'])
     print('done.')
     print('-- That\'s all folks!')
 
