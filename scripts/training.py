@@ -176,7 +176,7 @@ def training_process():
             l_m=torch.mean(torch.FloatTensor(epoch_l_m)),
             l_d=torch.mean(torch.FloatTensor(epoch_l_d)),
             l_tw=torch.mean(torch.FloatTensor(epoch_l_tw)),
-            l_twin=torch.mean(torch.FloatTensor(epoch_l_tw)),
+            l_twin=torch.mean(torch.FloatTensor(epoch_l_twin)),
             t=time_end - time_start
         ))
 
