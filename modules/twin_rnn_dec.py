@@ -59,9 +59,9 @@ class TwinRNNDec(Module):
             h_t_dec = h_t_dec.cuda()
             h_j_dec = h_j_dec.cuda()
 
-        for ts_f, ts_b in zip(range(0, seq_length, 1), range(seq_length-1, -1, -1)):
-            h_t_dec = self.gru_dec(h_enc[:, ts_b, :], h_t_dec)
-            h_j_dec[:, ts_f, :] = h_t_dec
+        for ts in range(seq_length-1, -1, -1):
+            h_t_dec = self.gru_dec(h_enc[:, ts, :], h_t_dec)
+            h_j_dec[:, ts, :] = h_t_dec
 
         return h_j_dec
 
