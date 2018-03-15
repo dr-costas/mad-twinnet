@@ -4,6 +4,8 @@
 """Loss functions and regularizations
 """
 
+from torch import norm
+
 __author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
 __all__ = ['kullback_leibler', 'l2_loss', 'sparsity_penalty', 'l2_reg_squared']
@@ -34,7 +36,7 @@ def l2_loss(y_hat, y):
     :return: The L2 loss.
     :rtype: torch.autograd.variable.Variable
     """
-    return (y - y_hat).pow(2.).sum(-1).sqrt().mean()
+    return norm(y - y_hat, 2, dim=-1).mean()
 
 
 def sparsity_penalty(weight_matrix):
