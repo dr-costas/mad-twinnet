@@ -22,6 +22,10 @@ or the associated binary files from Zenodo, please consider
 citing our paper available
 [from here](https://arxiv.org/abs/1802.00300).
 
+## Previous work
+A previous usage of the MaD architecture (including the **vanilla MaD**) can be found at:
+https://github.com/Js-Mim/mss_pytorch
+
 ## How do I use it with no manual
 You can:
 
