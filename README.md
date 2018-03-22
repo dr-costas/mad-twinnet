@@ -1,4 +1,4 @@
-# MaD TwinNet Audio Research Group Repository
+# MaD TwinNet Repository
 
 ### Welcome to the repository of the MaD TwinNet. 
 
