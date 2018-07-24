@@ -43,7 +43,8 @@ The second case is for harmonic/percussive separation. The
 [corresponding online demo is here](http://arg.cs.tut.fi/demo/hpss-madtwinnet/), 
 the paper is presented at the 
 [16th International Workshop on Acoustic Signal Enhancement (IWAENC), 2018](http://www.iwaenc2018.org/), 
-and an online version of the paper at arXiv is due to appear. 
+and an online version of the paper at arXiv is due to appear. You can see, though, the 
+[HAL entry of the HPSS paper](https://hal.archives-ouvertes.fr/hal-01812225). 
   
 
 ## How do I use it with no manual
@@ -212,14 +213,21 @@ Please remember to set properly the python path
 
 ## Acknowledgements
 
-- Part of the computations leading to these results was performed  on  a  TITAN-X 
-GPU  donated  by  NVIDIA  to  K. Drossos.
-- K.  Drossos  and  T.  Virtanen  wish  to  acknowledge  CSC-IT  Center  for  Science, 
-Finland,  for  computational  resources.
+- Part of the computations leading to these results was performed on a TITAN-X 
+GPU donated by [NVIDIA](https://www.nvidia.com) to K. Drossos.
+- K. Drossos and T. Virtanen wish to acknowledge [CSC-IT Center for Science, 
+Finland](https://www.csc.fi/csc), for computational resources.
 - D. Serdyuk  would  like  to  acknowledge the support of the following agencies for 
-research funding and computing support: Samsung, NSERC, Calcul Quebec, Compute Canada,
-the  Canada  Research  Chairs,  and  CIFAR.
-- S.-I. Mimilakis is supported by the European Union’s H2020  Framework  Programme
-(H2020-MSCA-ITN-2014) under grant agreement no 642685 MacSeNet.
-- The authors would like to thank P. Magron and G. Naithani (TUT, Finland) for their 
+research funding and computing support: [Samsung](https://www.samsung.com), 
+[NSERC](http://www.nserc-crsng.gc.ca/), 
+[Calcul Quebec](http://www.calculquebec.ca/), 
+[Compute Canada](https://www.computecanada.ca/),
+the  [Canada  Research  Chairs](http://www.chairs-chaires.gc.ca/),  and  
+[CIFAR](https://www.cifar.ca/).
+- S.-I. Mimilakis is supported by the [European Union’s H2020  Framework  Programme
+(H2020-MSCA-ITN-2014)](https://ec.europa.eu/programmes/horizon2020/) under grant 
+agreement no [642685 MacSeNet](http://www.macsenet.eu/#0) (yes, in the video, is him).
+- The authors would like to thank [P. Magron](http://www.cs.tut.fi/~magron/index.html) 
+and 
+[G. Naithani](https://tutcris.tut.fi/portal/en/persons/gaurav-naithani(93c5b9b8-53ec-4651-8b06-c8f764a3703e).html) (TUT, Finland) for their 
 valuable comments and feedback during the writing process.
