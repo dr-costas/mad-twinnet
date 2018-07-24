@@ -14,17 +14,37 @@ If you just need the **_results_**, you can get them from
 There is also an on-line demo of the MaD TwinNet at the [website of
 the MaD TwinNet](http://arg.cs.tut.fi/demo/mad-twinnet).
 
+The paper of the MaD TwinNet is presented at the 
+[IEEE World Congress on Computational Intelligence (WCCI)/International
+Joint Conference on Neural Networks, 2018](http://www.ecomp.poli.br/~wcci2018/) and can be found
+online at [the corresponding arXiv entry](https://arxiv.org/abs/1802.00300).
+
 If you need some help on using MaD TwinNet, please read the following
 instructions. 
 
 Also, if you use any of the things existing in this repository
 or the associated binary files from Zenodo, please consider 
-citing our paper available
-[from here](https://arxiv.org/abs/1802.00300).
+citing [the MaD TwinNet paper, available from here](https://arxiv.org/abs/1802.00300).
 
 ## Previous work
 A previous usage of the MaD architecture (including the **vanilla MaD**) can be found at:
 https://github.com/Js-Mim/mss_pytorch
+
+## Extensions
+Joining forces in the research (apart from beers) with the colleague P. Magron, we enhanced
+the performance of MaD TwinNet by applying phase recovery algorithms on top of MaD TwinNet.
+
+We tried two use cases. One regards the singing voice separation. You can see the results 
+for singing voice separation at the [corresponding online demo](http://arg.cs.tut.fi/demo/phase-madtwinnet/).
+The results are also presented at [INTERSPEECH 2018](http://interspeech2018.org/) and the paper
+can be found at [the paper entry on HAL (French equivalent of arXiv)](https://hal.archives-ouvertes.fr/hal-01741278).
+
+The second case is for harmonic/percussive separation. The 
+[corresponding online demo is here](http://arg.cs.tut.fi/demo/hpss-madtwinnet/), 
+the paper is presented at the 
+[16th International Workshop on Acoustic Signal Enhancement (IWAENC), 2018](http://www.iwaenc2018.org/), 
+and an online version of the paper at arXiv is due to appear. 
+  
 
 ## How do I use it with no manual
 You can:
