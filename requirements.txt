@@ -34,7 +34,7 @@ python-utils==2.2.0
 pytz==2017.2
 PyYAML==3.12
 pyzmq==16.0.2
-requests==2.18.4
+requests==2.20.0
 resampy==0.2.0
 scikit-learn==0.19.0
 scipy==1.0.0
