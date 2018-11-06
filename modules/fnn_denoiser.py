@@ -6,7 +6,7 @@
 
 from torch.nn import Module, Linear
 from torch.nn.functional import relu
-from torch.nn.init import xavier_normal
+from torch.nn.init import xavier_normal_
 
 __author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
@@ -33,10 +33,10 @@ class FNNDenoiser(Module):
     def initialize_module(self):
         """Manual weight/bias initialization.
         """
-        xavier_normal(self.fnn_enc.weight)
+        xavier_normal_(self.fnn_enc.weight)
         self.fnn_enc.bias.data.zero_()
 
-        xavier_normal(self.fnn_dec.weight)
+        xavier_normal_(self.fnn_dec.weight)
         self.fnn_dec.bias.data.zero_()
 
     def forward(self, v_j_filt_prime):

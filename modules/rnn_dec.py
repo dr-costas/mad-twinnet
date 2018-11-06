@@ -4,10 +4,10 @@
 """The RNN dec of the Masker.
 """
 
-from torch import has_cudnn as torch_has_cudnn, zeros as torch_zeros
+import torch
 from torch.autograd import Variable
 from torch.nn import Module, GRUCell
-from torch.nn.init import xavier_normal, orthogonal
+from torch.nn.init import xavier_normal_, orthogonal_
 
 __author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
@@ -29,6 +29,7 @@ class RNNDec(Module):
         self.gru_dec = GRUCell(self._input_dim, self._input_dim)
 
         self._debug = debug
+        self._device = 'cuda' if not self._debug and torch.cuda.is_available() else 'cpu'
 
         self.initialize_decoder()
 
@@ -36,8 +37,8 @@ class RNNDec(Module):
         """Manual weight/bias initialization.
         """
 
-        xavier_normal(self.gru_dec.weight_ih)
-        orthogonal(self.gru_dec.weight_hh)
+        xavier_normal_(self.gru_dec.weight_ih)
+        orthogonal_(self.gru_dec.weight_hh)
 
         self.gru_dec.bias_ih.data.zero_()
         self.gru_dec.bias_hh.data.zero_()
@@ -52,12 +53,8 @@ class RNNDec(Module):
         """
         batch_size = h_enc.size()[0]
         seq_length = h_enc.size()[1]
-        h_t_dec = Variable(torch_zeros(batch_size, self._input_dim))
-        h_j_dec = Variable(torch_zeros(batch_size, seq_length, self._input_dim))
-
-        if not self._debug and torch_has_cudnn:
-            h_t_dec = h_t_dec.cuda()
-            h_j_dec = h_j_dec.cuda()
+        h_t_dec = torch.zeros(batch_size, self._input_dim).to(self._device)
+        h_j_dec = torch.zeros(batch_size, seq_length, self._input_dim).to(self._device)
 
         for ts in range(seq_length):
             h_t_dec = self.gru_dec(h_enc[:, ts, :], h_t_dec)

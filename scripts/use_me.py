@@ -12,7 +12,6 @@ import time
 
 import numpy as np
 import torch
-from torch.autograd import Variable
 
 from helpers.data_feeder import data_feeder_testing, data_process_results_testing
 from helpers.settings import debug, hyper_parameters, output_states_path, training_constants, \
@@ -40,6 +39,8 @@ def use_me_process(sources_list, output_file_names):
         exit(-1)
     print('-- Now I will extract the voice and the background music from the provided files')
 
+    device = 'cuda' if not debug and torch.cuda.is_available() else 'cpu'
+
     # Masker modules
     rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length'], debug)
     rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim'], debug)
@@ -52,16 +53,10 @@ def use_me_process(sources_list, output_file_names):
     # Denoiser modules
     denoiser = FNNDenoiser(hyper_parameters['original_input_dim'])
 
-    rnn_enc.load_state_dict(torch.load(output_states_path['rnn_enc']))
-    rnn_dec.load_state_dict(torch.load(output_states_path['rnn_dec']))
-    fnn.load_state_dict(torch.load(output_states_path['fnn']))
-    denoiser.load_state_dict(torch.load(output_states_path['denoiser']))
-
-    if not debug and torch.has_cudnn:
-        rnn_enc = rnn_enc.cuda()
-        rnn_dec = rnn_dec.cuda()
-        fnn = fnn.cuda()
-        denoiser = denoiser.cuda()
+    rnn_enc.load_state_dict(torch.load(output_states_path['rnn_enc'])).to(device)
+    rnn_dec.load_state_dict(torch.load(output_states_path['rnn_dec'])).to(device)
+    fnn.load_state_dict(torch.load(output_states_path['fnn'])).to(device)
+    denoiser.load_state_dict(torch.load(output_states_path['denoiser'])).to(device)
 
     testing_it = data_feeder_testing(
         window_size=hyper_parameters['window_size'], fft_size=hyper_parameters['fft_size'],
@@ -92,10 +87,7 @@ def use_me_process(sources_list, output_file_names):
             b_start = batch * training_constants['batch_size']
             b_end = (batch + 1) * training_constants['batch_size']
 
-            v_in = Variable(torch.from_numpy(mix_magnitude[b_start:b_end, :, :]))
-
-            if not debug and torch.has_cudnn:
-                v_in = v_in.cuda()
+            v_in = torch.from_numpy(mix_magnitude[b_start:b_end, :, :]).to(device)
 
             tmp_voice_predicted = rnn_enc(v_in)
             tmp_voice_predicted = rnn_dec(tmp_voice_predicted)

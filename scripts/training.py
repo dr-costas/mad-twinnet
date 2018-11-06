@@ -10,7 +10,6 @@ import time
 
 import torch
 from torch import optim
-from torch.autograd import Variable
 
 from helpers.data_feeder import data_feeder_training
 from helpers.settings import debug, hyper_parameters, training_constants, \
@@ -27,37 +26,32 @@ def training_process():
     """The training process.
     """
 
+    device = 'cuda' if not debug and torch.cuda.is_available() else 'cpu'
+
     print('\n-- Starting training process. Debug mode: {}'.format(debug))
+    print('-- Process on: {}'.format(device), end='\n\n')
     print('-- Setting up modules... ', end='')
+
     # Masker modules
-    rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length'], debug)
-    rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim'], debug)
+    rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length'], debug).to(device)
+    rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim'], debug).to(device)
     fnn = FNNMasker(
         hyper_parameters['rnn_enc_output_dim'],
         hyper_parameters['original_input_dim'],
         hyper_parameters['context_length']
-    )
+    ).to(device)
 
     # Denoiser modules
-    denoiser = FNNDenoiser(hyper_parameters['original_input_dim'])
+    denoiser = FNNDenoiser(hyper_parameters['original_input_dim']).to(device)
 
     # TwinNet regularization modules
-    twin_net_rnn_dec = TwinRNNDec(hyper_parameters['rnn_enc_output_dim'], debug)
+    twin_net_rnn_dec = TwinRNNDec(hyper_parameters['rnn_enc_output_dim'], debug).to(device)
     twin_net_fnn_masker = FNNMasker(
         hyper_parameters['rnn_enc_output_dim'],
         hyper_parameters['original_input_dim'],
         hyper_parameters['context_length']
-    )
-    affine_transform = AffineTransform(hyper_parameters['rnn_enc_output_dim'])
-
-    if not debug and torch.has_cudnn:
-        rnn_enc = rnn_enc.cuda()
-        rnn_dec = rnn_dec.cuda()
-        fnn = fnn.cuda()
-        denoiser = denoiser.cuda()
-        twin_net_rnn_dec = twin_net_rnn_dec.cuda()
-        twin_net_fnn_masker = twin_net_fnn_masker.cuda()
-        affine_transform = affine_transform.cuda()
+    ).to(device)
+    affine_transform = AffineTransform(hyper_parameters['rnn_enc_output_dim']).to(device)
 
     print('done.')
     print('-- Setting up optimizes and losses... ', end='')
@@ -109,12 +103,8 @@ def training_process():
 
         # Epoch loop
         for data in epoch_it():
-            v_in = Variable(torch.from_numpy(data[0]))
-            v_j = Variable(torch.from_numpy(data[1]))
-
-            if not debug and torch.has_cudnn:
-                v_in = v_in.cuda()
-                v_j = v_j.cuda()
+            v_in = torch.from_numpy(data[0]).to(device)
+            v_j = torch.from_numpy(data[1]).to(device)
 
             # Masker pass
             h_enc = rnn_enc(v_in)
@@ -163,20 +153,20 @@ def training_process():
             optimizer.step()
 
             # Log losses
-            epoch_l_m.append(l_m.data[0])
-            epoch_l_d.append(l_d.data[0])
-            epoch_l_tw.append(l_tw.data[0])
-            epoch_l_twin.append(l_twin.data[0])
+            epoch_l_m.append(l_m.item())
+            epoch_l_d.append(l_d.item())
+            epoch_l_tw.append(l_tw.item())
+            epoch_l_twin.append(l_twin.item())
 
         time_end = time.time()
 
         # Tell us what happened
         print(training_output_string.format(
             ep=epoch,
-            l_m=torch.mean(torch.FloatTensor(epoch_l_m)),
-            l_d=torch.mean(torch.FloatTensor(epoch_l_d)),
-            l_tw=torch.mean(torch.FloatTensor(epoch_l_tw)),
-            l_twin=torch.mean(torch.FloatTensor(epoch_l_twin)),
+            l_m=torch.Tensor(epoch_l_m).mean(),
+            l_d=torch.Tensor(epoch_l_d).mean(),
+            l_tw=torch.Tensor(epoch_l_tw).mean(),
+            l_twin=torch.Tensor(epoch_l_twin).mean(),
             t=time_end - time_start
         ))
 

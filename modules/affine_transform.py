@@ -5,7 +5,7 @@
 """
 
 from torch.nn import Module, Linear
-from torch.nn.init import xavier_normal
+from torch.nn.init import xavier_normal_
 
 __author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
@@ -30,7 +30,7 @@ class AffineTransform(Module):
     def initialize_decoder(self):
         """Manual weight/bias initialization.
         """
-        xavier_normal(self.linear_layer.weight)
+        xavier_normal_(self.linear_layer.weight)
         self.linear_layer.bias.data.zero_()
 
     def forward(self, h_j_dec):

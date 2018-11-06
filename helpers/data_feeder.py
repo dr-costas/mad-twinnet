@@ -10,7 +10,7 @@ from operator import itemgetter
 import numpy as np
 from mir_eval import separation as bss_eval
 from numpy.lib import stride_tricks
-from scipy.signal import hamming
+from scipy import signal
 
 from helpers.audio_io import wav_read, wav_write
 from helpers.settings import dataset_paths, output_audio_paths, wav_quality
@@ -52,7 +52,7 @@ def data_feeder_training(window_size, fft_size, hop_size, seq_length, context_le
     :rtype: callable
     """
     mixtures_list, sources_list = _get_files_lists('training')
-    hamming_window = hamming(window_size, True)
+    hamming_window = signal.hamming(window_size, True)
 
     def epoch_it():
         for index in range(int(len(mixtures_list) / files_per_pass)):
@@ -117,7 +117,7 @@ def data_feeder_testing(window_size, fft_size, hop_size, seq_length, context_len
         sources_list = _get_files_lists('testing')[-1]
     else:
         usage_case = True
-    hamming_window = hamming(window_size, True)
+    hamming_window = signal.hamming(window_size, True)
 
     def testing_it():
 

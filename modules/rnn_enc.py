@@ -4,11 +4,9 @@
 """The RNN encoder of the Masker.
 """
 
-from torch import has_cudnn as torch_has_cudnn, \
-    zeros as torch_zeros, cat as torch_cat
-from torch.autograd import Variable
+import torch
 from torch.nn import Module, GRUCell
-from torch.nn.init import xavier_normal, orthogonal
+from torch.nn.init import xavier_normal_, orthogonal_
 
 __author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
@@ -35,20 +33,21 @@ class RNNEnc(Module):
         self.gru_enc_b = GRUCell(self._input_dim, self._input_dim)
 
         self._debug = debug
+        self._device = 'cuda' if not self._debug and torch.cuda.is_available() else 'cpu'
 
         self.initialize_encoder()
 
     def initialize_encoder(self):
         """Manual weight/bias initialization.
         """
-        xavier_normal(self.gru_enc_f.weight_ih)
-        orthogonal(self.gru_enc_f.weight_hh)
+        xavier_normal_(self.gru_enc_f.weight_ih)
+        orthogonal_(self.gru_enc_f.weight_hh)
 
         self.gru_enc_f.bias_ih.data.zero_()
         self.gru_enc_f.bias_hh.data.zero_()
 
-        xavier_normal(self.gru_enc_b.weight_ih)
-        orthogonal(self.gru_enc_b.weight_hh)
+        xavier_normal_(self.gru_enc_b.weight_ih)
+        orthogonal_(self.gru_enc_b.weight_hh)
 
         self.gru_enc_b.bias_ih.data.zero_()
         self.gru_enc_b.bias_hh.data.zero_()
@@ -64,26 +63,21 @@ class RNNEnc(Module):
         batch_size = v_in.size()[0]
         seq_length = v_in.size()[1]
 
-        h_t_f = Variable(torch_zeros(batch_size, self._input_dim))
-        h_t_b = Variable(torch_zeros(batch_size, self._input_dim))
-        h_enc = Variable(torch_zeros(
-            batch_size,
-            seq_length - (2 * self._context_length),
-            2 * self._input_dim)
-        )
-        v_tr = v_in[:, :, :self._input_dim]
+        h_t_f = torch.zeros(batch_size, self._input_dim).to(self._device)
+        h_t_b = torch.zeros(batch_size, self._input_dim).to(self._device)
 
-        if not self._debug and torch_has_cudnn:
-            h_t_f = h_t_f.cuda()
-            h_t_b = h_t_b.cuda()
-            h_enc = h_enc.cuda()
+        h_enc = torch.zeros(
+            batch_size, seq_length - (2 * self._context_length), 2 * self._input_dim
+        ).to(self._device)
+
+        v_tr = v_in[:, :, :self._input_dim]
 
         for t in range(seq_length):
             h_t_f = self.gru_enc_f((v_tr[:, t, :]), h_t_f)
             h_t_b = self.gru_enc_b((v_tr[:, seq_length - t - 1, :]), h_t_b)
 
             if self._context_length <= t < seq_length - self._context_length:
-                h_t = torch_cat([
+                h_t = torch.cat([
                     h_t_f + v_tr[:, t, :],
                     h_t_b + v_tr[:, seq_length - t - 1, :]
                 ], dim=1)
