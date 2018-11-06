@@ -53,7 +53,7 @@ pip=9.0.1=py36h8ec8b28_3
 progressbar2=3.18.1=py36_0
 py=1.4.34=py36h0712aa3_1
 pycparser=2.18=py36hf9f622e_1
-pyopenssl=17.2.0=py36h5cc804b_0
+pyopenssl=18.0.0=py36_0
 pyparsing=2.2.0=py36hee85983_1
 pyqt=5.6.0=py36h0386399_5
 pysocks=1.6.7=py36hd97a5b1_1
