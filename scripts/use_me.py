@@ -53,10 +53,17 @@ def use_me_process(sources_list, output_file_names):
     # Denoiser modules
     denoiser = FNNDenoiser(hyper_parameters['original_input_dim'])
 
-    rnn_enc.load_state_dict(torch.load(output_states_path['rnn_enc'])).to(device)
-    rnn_dec.load_state_dict(torch.load(output_states_path['rnn_dec'])).to(device)
-    fnn.load_state_dict(torch.load(output_states_path['fnn'])).to(device)
-    denoiser.load_state_dict(torch.load(output_states_path['denoiser'])).to(device)
+    rnn_enc.load_state_dict(torch.load(output_states_path['rnn_enc']))
+    rnn_enc.to(device)
+
+    rnn_dec.load_state_dict(torch.load(output_states_path['rnn_dec']))
+    rnn_dec.to(device)
+
+    fnn.load_state_dict(torch.load(output_states_path['fnn']))
+    fnn.to(device)
+
+    denoiser.load_state_dict(torch.load(output_states_path['denoiser']))
+    denoiser.to(device)
 
     testing_it = data_feeder_testing(
         window_size=hyper_parameters['window_size'], fft_size=hyper_parameters['fft_size'],
