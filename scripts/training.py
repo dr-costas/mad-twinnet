@@ -4,9 +4,8 @@
 """Training process module.
 """
 
-from __future__ import print_function
-
 import time
+from itertools import chain
 
 import torch
 from torch import optim
@@ -28,13 +27,13 @@ def training_process():
 
     device = 'cuda' if not debug and torch.cuda.is_available() else 'cpu'
 
-    print('\n-- Starting training process. Debug mode: {}'.format(debug))
-    print('-- Process on: {}'.format(device), end='\n\n')
-    print('-- Setting up modules... ', end='')
+    print('\n-- Starting training process. Debug mode: {}'.format(debug), flush=True)
+    print('-- Process on: {}'.format(device), end='\n\n', flush=True)
+    print('-- Setting up modules... ', end='', flush=True)
 
     # Masker modules
-    rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length'], debug).to(device)
-    rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim'], debug).to(device)
+    rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length']).to(device)
+    rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim']).to(device)
     fnn = FNNMasker(
         hyper_parameters['rnn_enc_output_dim'],
         hyper_parameters['original_input_dim'],
@@ -45,7 +44,7 @@ def training_process():
     denoiser = FNNDenoiser(hyper_parameters['original_input_dim']).to(device)
 
     # TwinNet regularization modules
-    twin_net_rnn_dec = TwinRNNDec(hyper_parameters['rnn_enc_output_dim'], debug).to(device)
+    twin_net_rnn_dec = TwinRNNDec(hyper_parameters['rnn_enc_output_dim']).to(device)
     twin_net_fnn_masker = FNNMasker(
         hyper_parameters['rnn_enc_output_dim'],
         hyper_parameters['original_input_dim'],
@@ -53,8 +52,8 @@ def training_process():
     ).to(device)
     affine_transform = AffineTransform(hyper_parameters['rnn_enc_output_dim']).to(device)
 
-    print('done.')
-    print('-- Setting up optimizes and losses... ', end='')
+    print('done.', flush=True)
+    print('-- Setting up optimizes and losses... ', end='', flush=True)
 
     # Objectives and penalties
     loss_masker = kl
@@ -66,17 +65,18 @@ def training_process():
 
     # Optimizer
     optimizer = optim.Adam(
-        list(rnn_enc.parameters()) +
-        list(rnn_dec.parameters()) +
-        list(fnn.parameters()) +
-        list(denoiser.parameters()) +
-        list(twin_net_rnn_dec.parameters()) +
-        list(twin_net_fnn_masker.parameters()) +
-        list(affine_transform.parameters()),
-        lr=hyper_parameters['learning_rate']
+        chain(
+            rnn_enc.parameters(),
+            rnn_dec.parameters(),
+            fnn.parameters(),
+            denoiser.parameters(),
+            twin_net_rnn_dec.parameters(),
+            twin_net_fnn_masker.parameters(),
+            affine_transform.parameters()
+        ), lr=hyper_parameters['learning_rate']
     )
 
-    print('done.')
+    print('done.', flush=True)
 
     # Initializing data feeder
     epoch_it = data_feeder_training(
@@ -90,7 +90,7 @@ def training_process():
         debug=debug
     )
 
-    print('-- Training starts\n')
+    print('-- Training starts\n', flush=True)
 
     # Training loop starts
     for epoch in range(training_constants['epochs']):
@@ -138,14 +138,16 @@ def training_process():
             loss.backward()
 
             # Gradient norm clipping
-            torch.nn.utils.clip_grad_norm(
-                list(rnn_enc.parameters()) +
-                list(rnn_dec.parameters()) +
-                list(fnn.parameters()) +
-                list(denoiser.parameters()) +
-                list(twin_net_rnn_dec.parameters()) +
-                list(twin_net_fnn_masker.parameters()) +
-                list(affine_transform.parameters()),
+            torch.nn.utils.clip_grad_norm_(
+                chain(
+                    rnn_enc.parameters(),
+                    rnn_dec.parameters(),
+                    fnn.parameters(),
+                    denoiser.parameters(),
+                    twin_net_rnn_dec.parameters(),
+                    twin_net_fnn_masker.parameters(),
+                    affine_transform.parameters
+                ),
                 max_norm=hyper_parameters['max_grad_norm'], norm_type=2
             )
 
@@ -168,17 +170,17 @@ def training_process():
             l_tw=torch.Tensor(epoch_l_tw).mean(),
             l_twin=torch.Tensor(epoch_l_twin).mean(),
             t=time_end - time_start
-        ))
+        ), flush=True)
 
     # Kindly end and save the model
-    print('\n-- Training done.')
-    print('-- Saving model.. ', end='')
+    print('\n-- Training done.', flush=True)
+    print('-- Saving model.. ', end='', flush=True)
     torch.save(rnn_enc.state_dict(), output_states_path['rnn_enc'])
     torch.save(rnn_dec.state_dict(), output_states_path['rnn_dec'])
     torch.save(fnn.state_dict(), output_states_path['fnn'])
     torch.save(denoiser.state_dict(), output_states_path['denoiser'])
-    print('done.')
-    print('-- That\'s all folks!')
+    print('done.', flush=True)
+    print('-- That\'s all folks!', flush=True)
 
 
 def main():
