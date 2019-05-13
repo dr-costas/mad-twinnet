@@ -4,8 +4,6 @@
 """Usage script.
 """
 
-from __future__ import print_function
-
 import argparse
 import os
 import time
@@ -32,18 +30,18 @@ def use_me_process(sources_list, output_file_names):
     :type output_file_names: list[list[str]]
     """
 
-    print('\n-- Welcome to MaD TwinNet.')
+    print('\n-- Welcome to MaD TwinNet.', flush=True)
     if debug:
-        print('\n-- Cannot proceed in debug mode. Please set debug=False at the settings file.')
-        print('-- Exiting.')
+        print('\n-- Cannot proceed in debug mode. Please set debug=False at the settings file.', flush=True)
+        print('-- Exiting.', flush=True)
         exit(-1)
-    print('-- Now I will extract the voice and the background music from the provided files')
+    print('-- Now I will extract the voice and the background music from the provided files', flush=True)
 
     device = 'cuda' if not debug and torch.cuda.is_available() else 'cpu'
 
     # Masker modules
-    rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length'], debug)
-    rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim'], debug)
+    rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length'])
+    rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim'])
     fnn = FNNMasker(
         hyper_parameters['rnn_enc_output_dim'],
         hyper_parameters['original_input_dim'],
@@ -72,7 +70,7 @@ def use_me_process(sources_list, output_file_names):
         debug=debug, sources_list=sources_list
     )
 
-    print('-- Let\'s go!\n')
+    print('-- Let\'s go!\n', flush=True)
     total_time = 0
 
     for index, data in enumerate(testing_it()):
@@ -117,15 +115,15 @@ def use_me_process(sources_list, output_file_names):
         print(usage_output_string_per_example.format(
             f=sources_list[index],
             t=e_time - s_time
-        ))
+        ), flush=True)
 
         total_time += e_time - s_time
 
-    print('\n-- Testing finished\n')
+    print('\n-- MaDTwinNet finished\n', flush=True)
     print(usage_output_string_total.format(
         t=total_time
-    ))
-    print('-- That\'s all folks!')
+    ), flush=True)
+    print('-- That\'s all folks!', flush=True)
 
 
 def _make_target_file_names(sources_list):
@@ -180,8 +178,8 @@ def main():
 
     if (input_wav == '' and len(input_list) == 0) or (input_wav != '' and len(input_list) != 0):
         print('-- Please specify **either** a wav file (with -w) **or** give'
-              'a txt file with file names in each line (with -l). ')
-        print('-- Exiting.')
+              'a txt file with file names in each line (with -l). ', flush=True)
+        print('-- Exiting.', flush=True)
         exit(-1)
 
     if len(input_list) == 0:
