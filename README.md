@@ -17,7 +17,7 @@ the MaD TwinNet](http://arg.cs.tut.fi/demo/mad-twinnet).
 The paper of the MaD TwinNet is presented at the 
 [IEEE World Congress on Computational Intelligence (WCCI)/International
 Joint Conference on Neural Networks, 2018](http://www.ecomp.poli.br/~wcci2018/) and can be found
-online at [the corresponding arXiv entry](https://arxiv.org/abs/1802.00300).
+online at [the corresponding arXiv entry](https://arxiv.org/abs/1802.00300). If you find MaD TwinNet useful, please consider citing our paper. 
 
 If you need some help on using MaD TwinNet, please read the following
 instructions. 
