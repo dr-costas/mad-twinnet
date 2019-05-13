@@ -6,7 +6,7 @@
 
 from torch.nn import Module, Linear
 from torch.nn.functional import relu
-from torch.nn.init import xavier_normal_
+from torch.nn.init import xavier_normal_, constant_
 
 __author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
@@ -31,7 +31,11 @@ class FNNMasker(Module):
         self._output_dim = output_dim
         self._context_length = context_length
 
-        self.linear_layer = Linear(self._input_dim, self._output_dim)
+        self.linear_layer = Linear(
+            in_features=self._input_dim,
+            out_features=self._output_dim,
+            bias=True
+        )
 
         self.initialize_decoder()
 
@@ -39,17 +43,17 @@ class FNNMasker(Module):
         """Manual weight/bias initialization.
         """
         xavier_normal_(self.linear_layer.weight)
-        self.linear_layer.bias.data.zero_()
+        constant_(self.linear_layer.bias, 0)
 
     def forward(self, h_j_dec, v_in):
         """Forward pass.
 
         :param h_j_dec: The output from the RNN decoder
-        :type h_j_dec: torch.autograd.variable.Variable
+        :type h_j_dec: torch.Tensor
         :param v_in: The original magnitude spectrogram input
-        :type v_in: numpy.core.multiarray.ndarray
+        :type v_in: torch.Tensor
         :return: The output of the AffineTransform of the masker
-        :rtype: torch.autograd.variable.Variable
+        :rtype: torch.Tensor
         """
         v_in_prime = v_in[:, self._context_length:-self._context_length, :]
         m_j = relu(self.linear_layer(h_j_dec))
