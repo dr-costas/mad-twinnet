@@ -17,11 +17,11 @@ class FNNMasker(Module):
     def __init__(self, input_dim, output_dim, context_length):
         """The FNN of the Masker.
 
-        :param input_dim: The input dimensionality
+        :param input_dim: The input dimensionality.
         :type input_dim: int
-        :param output_dim: The output dimensionality
+        :param output_dim: The output dimensionality.
         :type output_dim: int
-        :param context_length: The context length
+        :param context_length: The context length.
         :type context_length: int
         """
 
@@ -48,11 +48,11 @@ class FNNMasker(Module):
     def forward(self, h_j_dec, v_in):
         """Forward pass.
 
-        :param h_j_dec: The output from the RNN decoder
+        :param h_j_dec: The output from the RNN decoder.
         :type h_j_dec: torch.Tensor
-        :param v_in: The original magnitude spectrogram input
+        :param v_in: The original magnitude spectrogram input.
         :type v_in: torch.Tensor
-        :return: The output of the AffineTransform of the masker
+        :return: The output of the AffineTransform of the masker.
         :rtype: torch.Tensor
         """
         v_in_prime = v_in[:, self._context_length:-self._context_length, :]
