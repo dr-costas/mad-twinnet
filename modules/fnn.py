@@ -24,7 +24,6 @@ class FNNMasker(Module):
         :param context_length: The context length.
         :type context_length: int
         """
-
         super(FNNMasker, self).__init__()
 
         self._input_dim = input_dim
