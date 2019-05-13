@@ -4,8 +4,6 @@
 """Testing process module.
 """
 
-from __future__ import print_function
-
 import pickle
 import time
 
@@ -28,13 +26,13 @@ def testing_process():
 
     device = 'cuda' if not debug and torch.cuda.is_available() else 'cpu'
 
-    print('\n-- Starting testing process. Debug mode: {}'.format(debug))
-    print('-- Process on: {}'.format(device), end='\n\n')
-    print('-- Setting up modules... ', end='')
+    print('\n-- Starting testing process. Debug mode: {}'.format(debug), flush=True)
+    print('-- Process on: {}'.format(device), end='\n\n', flush=True)
+    print('-- Setting up modules... ', end='', flush=True)
 
     # Masker modules
-    rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length'], debug)
-    rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim'], debug)
+    rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length'])
+    rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim'])
     fnn = FNNMasker(
         hyper_parameters['rnn_enc_output_dim'],
         hyper_parameters['original_input_dim'],
@@ -49,7 +47,7 @@ def testing_process():
     fnn.load_state_dict(torch.load(output_states_path['fnn'])).to(device)
     denoiser.load_state_dict(torch.load(output_states_path['denoiser'])).to(device)
 
-    print('done.')
+    print('done.', flush=True)
 
     testing_it = data_feeder_testing(
         window_size=hyper_parameters['window_size'], fft_size=hyper_parameters['fft_size'],
@@ -58,7 +56,7 @@ def testing_process():
         debug=debug
     )
 
-    print('-- Testing starts\n')
+    print('-- Testing starts\n', flush=True)
 
     sdr = []
     sir = []
@@ -107,21 +105,21 @@ def testing_process():
             sdr=np.median([i for i in tmp_sdr[0] if not np.isnan(i)]),
             sir=np.median([i for i in tmp_sir[0] if not np.isnan(i)]),
             t=e_time - s_time
-        ))
+        ), flush=True)
 
         total_time += e_time - s_time
 
         sdr.append(tmp_sdr)
         sir.append(tmp_sir)
 
-    print('\n-- Testing finished\n')
+    print('\n-- Testing finished\n', flush=True)
     print(testing_output_string_all.format(
         sdr=np.median([ii for i in sdr for ii in i[0] if not np.isnan(ii)]),
         sir=np.median([ii for i in sir for ii in i[0] if not np.isnan(ii)]),
         t=total_time
-    ))
+    ), flush=True)
 
-    print('\n-- Saving results... ', end='')
+    print('\n-- Saving results... ', end='', flush=True)
 
     with open(metrics_paths['sdr'], 'wb') as f:
         pickle.dump(sdr, f, protocol=2)
@@ -129,8 +127,8 @@ def testing_process():
     with open(metrics_paths['sir'], 'wb') as f:
         pickle.dump(sir, f, protocol=2)
 
-    print('done!')
-    print('-- That\'s all folks!')
+    print('done!', flush=True)
+    print('-- That\'s all folks!', flush=True)
 
 
 def main():
