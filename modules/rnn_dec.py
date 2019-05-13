@@ -48,7 +48,7 @@ class RNNDec(Module):
 
         :param h_enc: The output of the RNN encoder.
         :type h_enc: torch.Tensor
-        :return: The output of the RNN dec (h_j_dec)
+        :return: The output of the RNN dec (h_j_dec).
         :rtype: torch.Tensor
         """
         return self.gru_dec(h_enc)[0]
