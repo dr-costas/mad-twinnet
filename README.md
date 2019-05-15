@@ -25,6 +25,23 @@ Also, if you use any of the things existing in this repository
 or the associated binary files from Zenodo, please consider 
 citing [the MaD TwinNet paper, available from here](https://arxiv.org/abs/1802.00300).
 
+## Table of contents
+
+1. [Previous work](#previous-work)
+2. [Extensions](#extensions)
+3. [How do I use it with no manual](#how-do-i-use-it-with-no-manual)
+4. [What is the MaD TwinNet](#what-is-the-mad-twinnet)
+5. [How do I use the MaD TwinNet](#how-do-i-use-the-mad-twinnet)
+  1. [Setting up the environment](#setting-up-the-environment)
+  2. [Dataset set-up](#dataset-set-up)
+  3. [Using the pre-trained weights](#using-the-pre-trained-weights)
+  4. [Re-training MaD TwinNet](#re-training-mad-twinnet)
+  5. [Altering the hyper-parameters](#altering-the-hyper-parameters)
+  6. [Re-testing MaD TwinNet](#re-testing-mad-twinnet)
+  7. [Use MaD TwinNet](#use-mad-twinnet)
+ 6. [Acknowledgements](#acknowledgements)
+
+
 ## Previous work
 A previous usage of the MaD architecture (including the **vanilla MaD**) can be found at:
 https://github.com/Js-Mim/mss_pytorch
