@@ -4,8 +4,7 @@
 
 If you know what you are doing, then jump ahead, get the **_pre-trained
 weights_** from 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592)
-and start using the MaD TwinNet.  
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592), get the paper code version from [here](https://github.com/dr-costas/mad-twinnet/tree/Paper-code), and start using the MaD TwinNet.  
 
 If you just need the **_results_**, you can get them from
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164585.svg)](https://doi.org/10.5281/zenodo.1164585)
