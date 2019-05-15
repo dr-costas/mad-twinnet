@@ -134,8 +134,7 @@ For the second option, you will have to at least modify the
 
 ### Using the pre-trained weights
 To use the pre-trained weights of the MaD TwinNet, first you have
-to obtain them from [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592)
-.
+to obtain them from [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592), and then **you must get the version of the code that is tagged as "Paper-code"** and available [here](https://github.com/dr-costas/mad-twinnet/tree/Paper-code). 
 
 Then, you have to unzip the obtained .zip file and move the resulting
 files in the `outputs/states/` directory. These files will be the
