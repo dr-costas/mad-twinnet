@@ -13,6 +13,7 @@ from torch import optim
 from helpers.data_feeder import data_feeder_training
 from helpers.settings import debug, hyper_parameters, training_constants, \
     training_output_string, output_states_path
+from helpers import printing
 from modules import RNNEnc, RNNDec, FNNMasker, FNNDenoiser, TwinRNNDec, AffineTransform
 from objectives import kullback_leibler as kl, l2_loss, sparsity_penalty, l2_reg_squared
 
@@ -27,68 +28,64 @@ def training_process():
 
     device = 'cuda' if not debug and torch.cuda.is_available() else 'cpu'
 
-    print('\n-- Starting training process. Debug mode: {}'.format(debug), flush=True)
-    print('-- Process on: {}'.format(device), end='\n\n', flush=True)
-    print('-- Setting up modules... ', end='', flush=True)
+    printing.print_intro_messages(device)
+    printing.print_msg('Starting training process. Debug mode: {}'.format(debug))
 
-    # Masker modules
-    rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length']).to(device)
-    rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim']).to(device)
-    fnn = FNNMasker(
-        hyper_parameters['rnn_enc_output_dim'],
-        hyper_parameters['original_input_dim'],
-        hyper_parameters['context_length']
-    ).to(device)
+    with printing.InformAboutProcess('Setting up modules'):
+        # Masker modules
+        rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length']).to(device)
+        rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim']).to(device)
+        fnn = FNNMasker(
+            hyper_parameters['rnn_enc_output_dim'],
+            hyper_parameters['original_input_dim'],
+            hyper_parameters['context_length']
+        ).to(device)
 
-    # Denoiser modules
-    denoiser = FNNDenoiser(hyper_parameters['original_input_dim']).to(device)
+        # Denoiser modules
+        denoiser = FNNDenoiser(hyper_parameters['original_input_dim']).to(device)
 
-    # TwinNet regularization modules
-    twin_net_rnn_dec = TwinRNNDec(hyper_parameters['rnn_enc_output_dim']).to(device)
-    twin_net_fnn_masker = FNNMasker(
-        hyper_parameters['rnn_enc_output_dim'],
-        hyper_parameters['original_input_dim'],
-        hyper_parameters['context_length']
-    ).to(device)
-    affine_transform = AffineTransform(hyper_parameters['rnn_enc_output_dim']).to(device)
+        # TwinNet regularization modules
+        twin_net_rnn_dec = TwinRNNDec(hyper_parameters['rnn_enc_output_dim']).to(device)
+        twin_net_fnn_masker = FNNMasker(
+            hyper_parameters['rnn_enc_output_dim'],
+            hyper_parameters['original_input_dim'],
+            hyper_parameters['context_length']
+        ).to(device)
+        affine_transform = AffineTransform(hyper_parameters['rnn_enc_output_dim']).to(device)
 
-    print('done.', flush=True)
-    print('-- Setting up optimizes and losses... ', end='', flush=True)
+    with printing.InformAboutProcess('Setting up optimizes and losses'):
+        # Objectives and penalties
+        loss_masker = kl
+        loss_denoiser = kl
+        loss_twin = kl
+        reg_twin = l2_loss
+        reg_fnn_masker = sparsity_penalty
+        reg_fnn_dec = l2_reg_squared
 
-    # Objectives and penalties
-    loss_masker = kl
-    loss_denoiser = kl
-    loss_twin = kl
-    reg_twin = l2_loss
-    reg_fnn_masker = sparsity_penalty
-    reg_fnn_dec = l2_reg_squared
+        # Optimizer
+        optimizer = optim.Adam(
+            chain(
+                rnn_enc.parameters(),
+                rnn_dec.parameters(),
+                fnn.parameters(),
+                denoiser.parameters(),
+                twin_net_rnn_dec.parameters(),
+                twin_net_fnn_masker.parameters(),
+                affine_transform.parameters()
+            ), lr=hyper_parameters['learning_rate']
+        )
 
-    # Optimizer
-    optimizer = optim.Adam(
-        chain(
-            rnn_enc.parameters(),
-            rnn_dec.parameters(),
-            fnn.parameters(),
-            denoiser.parameters(),
-            twin_net_rnn_dec.parameters(),
-            twin_net_fnn_masker.parameters(),
-            affine_transform.parameters()
-        ), lr=hyper_parameters['learning_rate']
-    )
-
-    print('done.', flush=True)
-
-    # Initializing data feeder
-    epoch_it = data_feeder_training(
-        window_size=hyper_parameters['window_size'],
-        fft_size=hyper_parameters['fft_size'],
-        hop_size=hyper_parameters['hop_size'],
-        seq_length=hyper_parameters['seq_length'],
-        context_length=hyper_parameters['context_length'],
-        batch_size=training_constants['batch_size'],
-        files_per_pass=training_constants['files_per_pass'],
-        debug=debug
-    )
+    with printing.InformAboutProcess('Initializing data feeder'):
+        epoch_it = data_feeder_training(
+            window_size=hyper_parameters['window_size'],
+            fft_size=hyper_parameters['fft_size'],
+            hop_size=hyper_parameters['hop_size'],
+            seq_length=hyper_parameters['seq_length'],
+            context_length=hyper_parameters['context_length'],
+            batch_size=training_constants['batch_size'],
+            files_per_pass=training_constants['files_per_pass'],
+            debug=debug
+        )
 
     print('-- Training starts\n', flush=True)
 
