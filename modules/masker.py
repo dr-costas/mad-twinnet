@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""The Masker module.
+"""
+
 from collections import namedtuple
 
 from torch.nn import Module
@@ -48,7 +51,7 @@ class Masker(Module):
 
         self.output = namedtuple(
             typename='masker_output',
-            field_names=['h_enc', 'h_dec', 'fnn']
+            field_names=['h_enc', 'h_dec', 'v_j_filt_prime']
         )
 
     def forward(self, x):
