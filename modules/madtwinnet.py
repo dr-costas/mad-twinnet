@@ -8,7 +8,9 @@ from collections import namedtuple
 
 from torch.nn import Module
 
-from modules import masker, twin_net, fnn_denoiser, affine_transform
+from modules import MaD
+from modules._twin_net import TwinNet
+from modules._affine_transform import AffineTransform
 
 __author__ = 'Konstantinos Drossos -- Tampere University'
 __docformat__ = 'reStructuredText'
@@ -39,24 +41,20 @@ class MaDTwinNet(Module):
         """
         super(MaDTwinNet, self).__init__()
 
-        self.masker = masker.Masker(
+        self.mad = MaD(
             rnn_enc_input_dim=rnn_enc_input_dim,
             rnn_dec_input_dim=rnn_dec_input_dim,
             context_length=context_length,
             original_input_dim=original_input_dim
         )
 
-        self.twin_net = twin_net.TwinNet(
+        self.twin_net = TwinNet(
             rnn_dec_input_dim=rnn_dec_input_dim,
             original_input_dim=original_input_dim,
             context_length=context_length
         )
 
-        self.denoiser = fnn_denoiser.FNNDenoiser(
-            input_dim=original_input_dim
-        )
-
-        self.affine = affine_transform.AffineTransform(
+        self.affine = AffineTransform(
             input_dim=rnn_dec_input_dim
         )
 
@@ -85,25 +83,22 @@ class MaDTwinNet(Module):
                    - `affine_output`, the output of the affine\
                      transform for the TwinNet regularization
                    - `h_dec_twin`, the output of the RNN of the\
-                     TwinNet.
+                     TwinNet
         :rtype: collections.namedtuple[torch.Tensor, torch.Tensor\
                 torch.Tensor, torch.Tensor, torch.Tensor]
         """
         # Masker pass
-        m_out = self.masker(x)
+        mad_out = self.mad(x)
 
         # TwinNet pass
-        twin_net_out = self.twin_net(m_out.h_enc, x)
+        twin_net_out = self.twin_net(mad_out.h_enc, x)
 
         # Twin net regularization
-        affine = self.affine(m_out.h_dec)
-
-        # Denoiser pass
-        v_j_filt = self.denoiser(m_out.v_j_filt_prime)
+        affine = self.affine(mad_out.h_dec)
 
         return self.output(
-            m_out.v_j_filt_prime,
-            v_j_filt,
+            mad_out.v_j_filt_prime,
+            mad_out.v_j_filt,
             twin_net_out.v_j_filt_prime_twin,
             affine,
             twin_net_out.h_dec_twin
