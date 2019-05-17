@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""The TwinNet of the Masker.
+"""
+
+from collections import namedtuple
+
 from torch.nn import Module
 
 from modules import twin_rnn_dec, fnn
@@ -25,6 +30,11 @@ class TwinNet(Module):
             context_length=context_length
         )
 
+        self.output = namedtuple(
+            'twin_net_output',
+            ['h_dec_twin', 'v_j_filt_prime_twin']
+        )
+
     def forward(self, h_enc, x):
         """The forward pass of the TwinNet.
 
@@ -37,7 +47,7 @@ class TwinNet(Module):
         :rtype: torch.Tensor
         """
         h_dec_twin = self.rnn_dec(h_enc)
-        return self.fnn(h_dec_twin, x)
+        return self.output(h_dec_twin, self.fnn(h_dec_twin, x))
 
 
 # EOF
