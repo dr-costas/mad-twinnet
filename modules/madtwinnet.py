@@ -8,7 +8,7 @@ from collections import namedtuple
 
 from torch.nn import Module
 
-from modules import MaD
+from modules.mad import MaD
 from modules._twin_net import TwinNet
 from modules._affine_transform import AffineTransform
 
