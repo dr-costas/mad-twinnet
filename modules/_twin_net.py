@@ -8,11 +8,11 @@ from collections import namedtuple
 
 from torch.nn import Module
 
-from modules import twin_rnn_dec, fnn
+from modules import _twin_rnn_dec, _fnn
 
 __author__ = 'Konstantinos Drossos -- Tampere University'
 __docformat__ = 'reStructuredText'
-__all__ = []
+__all__ = ['TwinNet']
 
 
 class TwinNet(Module):
@@ -20,11 +20,11 @@ class TwinNet(Module):
     def __init__(self, rnn_dec_input_dim, original_input_dim, context_length):
         super(TwinNet, self).__init__()
 
-        self.rnn_dec = twin_rnn_dec.TwinRNNDec(
+        self.rnn_dec = _twin_rnn_dec.TwinRNNDec(
             input_dim=rnn_dec_input_dim
         )
 
-        self.fnn = fnn.FNNMasker(
+        self.fnn = _fnn.FNNMasker(
             input_dim=rnn_dec_input_dim,
             output_dim=original_input_dim,
             context_length=context_length

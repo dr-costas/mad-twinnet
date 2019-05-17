@@ -8,7 +8,7 @@ from collections import namedtuple
 
 from torch.nn import Module
 
-from modules import rnn_enc, rnn_dec, fnn
+from modules import _rnn_enc, _rnn_dec, _fnn
 
 __author__ = 'Konstantinos Drossos -- Tampere University'
 __docformat__ = 'reStructuredText'
@@ -35,15 +35,15 @@ class Masker(Module):
         """
         super(Masker, self).__init__()
 
-        self.rnn_enc = rnn_enc.RNNEnc(
+        self.rnn_enc = _rnn_enc.RNNEnc(
             input_dim=rnn_enc_input_dim,
             context_length=context_length
         )
-        self.rnn_dec = rnn_dec.RNNDec(
+        self.rnn_dec = _rnn_dec.RNNDec(
             input_dim=rnn_dec_input_dim
         )
 
-        self.fnn = fnn.FNNMasker(
+        self.fnn = _fnn.FNNMasker(
             input_dim=rnn_dec_input_dim,
             output_dim=original_input_dim,
             context_length=context_length
