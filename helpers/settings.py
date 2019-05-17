@@ -70,16 +70,13 @@ metrics_paths = {
 }
 
 output_states_path = {
-    'rnn_enc': os.path.join(_states_path, 'rnn_enc{}.pt'.format(_debug_suffix)),
-    'rnn_dec': os.path.join(_states_path, 'rnn_dec{}.pt'.format(_debug_suffix)),
-    'fnn': os.path.join(_states_path, 'fnn{}.pt'.format(_debug_suffix)),
-    'denoiser': os.path.join(_states_path, 'denoiser{}.pt'.format(_debug_suffix))
+    'mad': os.path.join(_states_path, 'mad{}.pt'.format(_debug_suffix))
 }
 
 # Strings
 training_output_string = 'Epoch: {ep:3d} Losses: -- ' \
-                         'Masker:{l_m:6.4f} | Denoiser:{l_d:6.4f} | ' \
-                         'Twin:{l_tw:6.4f} | Twin reg.:{l_twin:6.4f} | ' \
+                         'Masker:{l_m:7.4f} | Denoiser:{l_d:7.4f} | ' \
+                         'Twin:{l_tw:7.4f} | Twin reg.:{l_twin:7.4f} | ' \
                          'Time:{t:6.2f} sec(s)'
 
 testing_output_string_per_example = 'Example: {e:2d}, Median -- ' \
