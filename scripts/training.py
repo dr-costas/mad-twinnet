@@ -5,78 +5,178 @@
 """
 
 import time
-from itertools import chain
 
-import torch
-from torch import optim
+from torch import cuda, from_numpy
+from torch import optim, nn, save
 
-from helpers.data_feeder import data_feeder_training
+from helpers import data_feeder, printing
 from helpers.settings import debug, hyper_parameters, training_constants, \
     training_output_string, output_states_path
-from helpers import printing
-from modules import RNNEnc, RNNDec, FNNMasker, FNNDenoiser, TwinRNNDec, AffineTransform
+from modules.madtwinnet import MaDTwinNet
 from objectives import kullback_leibler as kl, l2_loss, sparsity_penalty, l2_reg_squared
 
-__author__ = ['Konstantinos Drossos -- TUT', 'Stylianos Mimilakis -- Fraunhofer IDMT']
+__author__ = ['Konstantinos Drossos -- TAU', 'Stylianos Mimilakis -- Fraunhofer IDMT']
 __docformat__ = 'reStructuredText'
 __all__ = ['training_process']
+
+
+def _one_epoch(module, epoch_it, solver, separation_loss, twin_reg_loss,
+               reg_fnn_masker, reg_fnn_dec, device, epoch_index, lambda_l_twin,
+               lambda_1, lambda_2, max_grad_norm):
+    """One training epoch for MaD TwinNet.
+
+    :param module: The module of MaD TwinNet.
+    :type module: torch.nn.Module
+    :param epoch_it: The data iterator for the epoch.
+    :type epoch_it: callable
+    :param solver: The optimizer to be used.
+    :type solver: torch.optim.Optimizer
+    :param separation_loss: The loss function used for\
+                            the source separation.
+    :type separation_loss: callable
+    :param twin_reg_loss: The loss function used for the\
+                          TwinNet regularization.
+    :type twin_reg_loss: callable
+    :param reg_fnn_masker: The weight regularization function\
+                           for the FNN of the Masker.
+    :type reg_fnn_masker: callable
+    :param reg_fnn_dec: The weight regularization function\
+                        for the FNN of the Denoiser.
+    :type reg_fnn_dec: callable
+    :param device: The device to be used.
+    :type device: str
+    :param epoch_index: The current epoch.
+    :type epoch_index: int
+    :param lambda_l_twin: The weight for the TwinNet loss.
+    :type lambda_l_twin: float
+    :param lambda_1: The weight for the `reg_fnn_masker`.
+    :type lambda_1: float
+    :param lambda_2: The weight for the `reg_fnn_dec`.
+    :type lambda_2: float
+    :param max_grad_norm: The maximum gradient norm for\
+                          gradient norm clipping.
+    :type max_grad_norm: float
+    """
+    def _training_iteration(_m, _data, _device, _solver, _sep_l, _reg_twin,
+                            _reg_m, _reg_d, _lambda_l_twin, _lambda_1,
+                            _lambda_2, _max_grad_norm):
+        """One training iteration for the MaD TwinNet.
+
+        :param _m: The module of MaD TwinNet.
+        :type _m: torch.nn.Module
+        :param _data: The data
+        :type _data: numpy.ndarray
+        :param _device: The device to be used.
+        :type _device: str
+        :param _solver: The optimizer to be used.
+        :type _solver: torch.optim.Optimizer
+        :param _sep_l: The loss function used for the\
+                       source separation.
+        :type _sep_l: callable
+        :param _reg_twin: The loss function used for the\
+                          TwinNet regularization.
+        :type _reg_twin: callable
+        :param _reg_m: The weight regularization function\
+                       for the FNN of the Masker.
+        :type _reg_m: callable
+        :param _reg_d: The weight regularization function\
+                       for the FNN of the Denoiser.
+        :type _reg_d: callable
+        :param _lambda_l_twin: The weight for the TwinNet loss.
+        :type _lambda_l_twin: float
+        :param _lambda_1: The weight for the `_reg_m`.
+        :type _lambda_1: float
+        :param _lambda_2: The weight for the `_reg_d`.
+        :type _lambda_2: float
+        :param _max_grad_norm: The maximum gradient norm for\
+                               gradient norm clipping.
+        :type _max_grad_norm: float
+        :return: The losses for the iteration.
+        :rtype: list[float]
+        """
+        # Get the data to torch and to the device used
+        v_in, v_j = [from_numpy(_d).to(_device) for _d in _data]
+
+        # Forward pass of the module
+        output = _m(v_in)
+
+        # Calculate losses
+        l_m = _sep_l(output.v_j_filt_prime, v_j)
+        l_d = _sep_l(output.v_j_filt, v_j)
+
+        l_tw = _sep_l(output.v_j_filt_prime_twin, v_j).mul(_lambda_l_twin)
+        l_twin = _reg_twin(output.affine_output, output.h_dec_twin.detach())
+
+        w_reg_masker = _reg_m(_m.mad.masker.fnn.linear_layer.weight).mul(_lambda_1)
+        w_reg_denoiser = _reg_d(_m.mad.denoiser.fnn_dec.weight).mul(_lambda_2)
+
+        # Make MaD TwinNet objective
+        loss = l_m.add(l_d).add(l_tw).add(l_twin).add(w_reg_masker).add(w_reg_denoiser)
+
+        # Clear previous gradients
+        _solver.zero_grad()
+
+        # Backward pass
+        loss.backward()
+
+        # Gradient norm clipping
+        nn.utils.clip_grad_norm_(_m.parameters(), max_norm=_max_grad_norm, norm_type=2)
+
+        # Optimize
+        _solver.step()
+
+        return [l_m.item(), l_d.item(), l_tw.item(), l_twin.item()]
+
+    # Log starting time
+    time_start = time.time()
+
+    # Do iteration over all batches
+    iter_results = [
+        _training_iteration(module, data, device, solver, separation_loss,
+                            twin_reg_loss, reg_fnn_masker, reg_fnn_dec,
+                            lambda_l_twin, lambda_1, lambda_2, max_grad_norm)
+        for data in epoch_it()
+    ]
+
+    # Log ending time
+    time_end = time.time()
+
+    # Print to stdout
+    printing.print_msg(training_output_string.format(
+        ep=epoch_index,
+        t=time_end - time_start,
+        **{k: v for k, v in zip(['l_m', 'l_d', 'l_tw', 'l_twin'],
+                                [sum(i)/len(iter_results)
+                                 for i in zip(*iter_results)])
+           }
+    ))
 
 
 def training_process():
     """The training process.
     """
-
-    device = 'cuda' if not debug and torch.cuda.is_available() else 'cpu'
+    device = 'cuda' if not debug and cuda.is_available() else 'cpu'
 
     printing.print_intro_messages(device)
     printing.print_msg('Starting training process. Debug mode: {}'.format(debug))
 
-    with printing.InformAboutProcess('Setting up modules'):
-        # Masker modules
-        rnn_enc = RNNEnc(hyper_parameters['reduced_dim'], hyper_parameters['context_length']).to(device)
-        rnn_dec = RNNDec(hyper_parameters['rnn_enc_output_dim']).to(device)
-        fnn = FNNMasker(
-            hyper_parameters['rnn_enc_output_dim'],
-            hyper_parameters['original_input_dim'],
-            hyper_parameters['context_length']
+    with printing.InformAboutProcess('Setting up MaD TwinNet'):
+        mad_twin_net = MaDTwinNet(
+            rnn_enc_input_dim=hyper_parameters['reduced_dim'],
+            rnn_dec_input_dim=hyper_parameters['rnn_enc_output_dim'],
+            original_input_dim=hyper_parameters['original_input_dim'],
+            context_length=hyper_parameters['context_length']
         ).to(device)
 
-        # Denoiser modules
-        denoiser = FNNDenoiser(hyper_parameters['original_input_dim']).to(device)
-
-        # TwinNet regularization modules
-        twin_net_rnn_dec = TwinRNNDec(hyper_parameters['rnn_enc_output_dim']).to(device)
-        twin_net_fnn_masker = FNNMasker(
-            hyper_parameters['rnn_enc_output_dim'],
-            hyper_parameters['original_input_dim'],
-            hyper_parameters['context_length']
-        ).to(device)
-        affine_transform = AffineTransform(hyper_parameters['rnn_enc_output_dim']).to(device)
-
-    with printing.InformAboutProcess('Setting up optimizes and losses'):
-        # Objectives and penalties
-        loss_masker = kl
-        loss_denoiser = kl
-        loss_twin = kl
-        reg_twin = l2_loss
-        reg_fnn_masker = sparsity_penalty
-        reg_fnn_dec = l2_reg_squared
-
+    with printing.InformAboutProcess('Setting up optimizer'):
         # Optimizer
         optimizer = optim.Adam(
-            chain(
-                rnn_enc.parameters(),
-                rnn_dec.parameters(),
-                fnn.parameters(),
-                denoiser.parameters(),
-                twin_net_rnn_dec.parameters(),
-                twin_net_fnn_masker.parameters(),
-                affine_transform.parameters()
-            ), lr=hyper_parameters['learning_rate']
+            mad_twin_net.parameters(),
+            lr=hyper_parameters['learning_rate']
         )
 
     with printing.InformAboutProcess('Initializing data feeder'):
-        epoch_it = data_feeder_training(
+        epoch_it = data_feeder.data_feeder_training(
             window_size=hyper_parameters['window_size'],
             fft_size=hyper_parameters['fft_size'],
             hop_size=hyper_parameters['hop_size'],
@@ -87,97 +187,22 @@ def training_process():
             debug=debug
         )
 
-    print('-- Training starts\n', flush=True)
+    printing.print_msg('Training starts', end='\n\n')
 
-    # Training loop starts
-    for epoch in range(training_constants['epochs']):
-        epoch_l_m = []
-        epoch_l_d = []
-        epoch_l_tw = []
-        epoch_l_twin = []
-
-        time_start = time.time()
-
-        # Epoch loop
-        for data in epoch_it():
-            v_in = torch.from_numpy(data[0]).to(device)
-            v_j = torch.from_numpy(data[1]).to(device)
-
-            # Masker pass
-            h_enc = rnn_enc(v_in)
-            h_dec = rnn_dec(h_enc)
-            v_j_filt_prime = fnn(h_dec, v_in)
-
-            # TwinNet pass
-            h_dec_twin = twin_net_rnn_dec(h_enc)
-            v_j_filt_prime_twin = twin_net_fnn_masker(h_dec_twin, v_in)
-
-            # Twin net regularization
-            affine_output = affine_transform(h_dec)
-
-            # Denoiser pass
-            v_j_filt = denoiser(v_j_filt_prime)
-
-            optimizer.zero_grad()
-
-            # Calculate losses
-            l_m = loss_masker(v_j_filt_prime, v_j)
-            l_d = loss_denoiser(v_j_filt, v_j)
-            l_tw = loss_twin(v_j_filt_prime_twin, v_j)
-            l_twin = reg_twin(affine_output, h_dec_twin.detach())
-
-            # Make MaD TwinNet objective
-            loss = l_m + l_d + l_tw + (hyper_parameters['lambda_l_twin'] * l_twin) + \
-                   (hyper_parameters['lambda_1'] * reg_fnn_masker(fnn.linear_layer.weight)) + \
-                   (hyper_parameters['lambda_2'] * reg_fnn_dec(denoiser.fnn_dec.weight))
-
-            # Backward pass
-            loss.backward()
-
-            # Gradient norm clipping
-            torch.nn.utils.clip_grad_norm_(
-                chain(
-                    rnn_enc.parameters(),
-                    rnn_dec.parameters(),
-                    fnn.parameters(),
-                    denoiser.parameters(),
-                    twin_net_rnn_dec.parameters(),
-                    twin_net_fnn_masker.parameters(),
-                    affine_transform.parameters
-                ),
-                max_norm=hyper_parameters['max_grad_norm'], norm_type=2
-            )
-
-            # Optimize
-            optimizer.step()
-
-            # Log losses
-            epoch_l_m.append(l_m.item())
-            epoch_l_d.append(l_d.item())
-            epoch_l_tw.append(l_tw.item())
-            epoch_l_twin.append(l_twin.item())
-
-        time_end = time.time()
-
-        # Tell us what happened
-        print(training_output_string.format(
-            ep=epoch,
-            l_m=torch.Tensor(epoch_l_m).mean(),
-            l_d=torch.Tensor(epoch_l_d).mean(),
-            l_tw=torch.Tensor(epoch_l_tw).mean(),
-            l_twin=torch.Tensor(epoch_l_twin).mean(),
-            t=time_end - time_start
-        ), flush=True)
+    # Training loop
+    [_one_epoch(mad_twin_net, epoch_it, optimizer, kl, l2_loss,
+                sparsity_penalty, l2_reg_squared, device, e,
+                hyper_parameters['lambda_l_twin'], hyper_parameters['lambda_1'],
+                hyper_parameters['lambda_2'], hyper_parameters['max_grad_norm'])
+     for e in range(training_constants['epochs'])]
 
     # Kindly end and save the model
-    print('\n-- Training done.', flush=True)
-    print('-- Saving model.. ', end='', flush=True)
-    torch.save(rnn_enc.state_dict(), output_states_path['rnn_enc'])
-    torch.save(rnn_dec.state_dict(), output_states_path['rnn_dec'])
-    torch.save(fnn.state_dict(), output_states_path['fnn'])
-    torch.save(denoiser.state_dict(), output_states_path['denoiser'])
-    print('done.', flush=True)
-    print('-- That\'s all folks!', flush=True)
+    printing.print_msg('Training done.', start='\n-- ')
+
+    with printing.InformAboutProcess('Saving model.. '):
+        save(mad_twin_net.mad.state_dict(), output_states_path['mad'])
+
+    printing.print_msg('That\'s all folks!')
 
 
 def main():
