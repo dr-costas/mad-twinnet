@@ -4,7 +4,7 @@
 """Data getting and feeding module.
 """
 
-import os
+from pathlib import Path
 from operator import itemgetter
 
 import numpy as np
@@ -107,7 +107,7 @@ def data_feeder_testing(window_size, fft_size, hop_size, seq_length, context_len
     :param debug: A flag to indicate debug
     :type debug: bool
     :param sources_list: The file list provided for using the MaD-TwinNet.
-    :type sources_list: list[str]
+    :type sources_list: list[str|pathlib.Path]
     :return: An iterator that will provide the input and target values.\
              The iterator yields (mix, mix magnitude, mix phase, voice true, bg true) values.
     :rtype: callable
@@ -164,7 +164,7 @@ def data_process_results_testing(index, voice_true, bg_true, voice_predicted,
                              and background music. If this argument is not
                              None, then the function just synthesizes the
                              voice and the background music, and saves them.
-    :type output_file_name: list[str] | None
+    :type output_file_name: list[pathlib.Path] | None
     :return: The values of SDR and SIR for each of the frames in\
              the current track, for both voice and background music.
     :rtype: (list[numpy.core.multiarray.ndarray], list[numpy.core.multiarray.ndarray])
@@ -191,8 +191,8 @@ def data_process_results_testing(index, voice_true, bg_true, voice_predicted,
     bg_hat = mix[:min_len] - voice_hat[:min_len]
 
     if output_file_name is None:
-        voice_hat_path = output_audio_paths['voice_predicted'].format(p=example_index)
-        bg_hat_path = output_audio_paths['bg_predicted'].format(p=example_index)
+        voice_hat_path = Path(output_audio_paths['voice_predicted'].format(p=example_index))
+        bg_hat_path = Path(output_audio_paths['bg_predicted'].format(p=example_index))
         wav_write(voice_true, file_name=output_audio_paths['voice_true'].format(p=example_index), **wav_quality)
         wav_write(bg_true, file_name=output_audio_paths['bg_true'].format(p=example_index), **wav_quality)
         wav_write(mix, file_name=output_audio_paths['mix'].format(p=example_index), **wav_quality)
@@ -222,17 +222,17 @@ def _get_files_lists(subset):
     :param subset: The subset that we are interested in (i.e. training or testing).
     :type subset: str
     :return: The lists with the file paths of the files that we want to use.
-    :rtype: (list[str], list[str])
+    :rtype: (list[pathlib.Path], list[pathlib.Path])
     """
+    mixtures_dir = Path(dataset_paths['mixtures'])
+    sources_dir = Path(dataset_paths['sources'])
     specific_dir = 'Dev' if subset == 'training' else 'Test'
-    mixtures_dir = os.path.join(dataset_paths['mixtures'], specific_dir)
-    sources_dir = os.path.join(dataset_paths['sources'], specific_dir)
 
-    mixtures_list = [os.path.join(mixtures_dir, file_path)
-                     for file_path in sorted(os.listdir(mixtures_dir))]
+    mixtures_dir = mixtures_dir.joinpath(specific_dir)
+    sources_dir = sources_dir.joinpath(specific_dir)
 
-    sources_list = [os.path.join(sources_dir, file_path)
-                    for file_path in sorted(os.listdir(sources_dir))]
+    mixtures_list = [file_path for file_path in sorted(mixtures_dir.iterdir())]
+    sources_list = [file_path for file_path in sorted(sources_dir.iterdir())]
 
     return mixtures_list, sources_list
 
@@ -316,9 +316,9 @@ def _get_data_training(current_set, set_size, mixtures_list, sources_list,
     :param set_size: The size of the sets that we consider.
     :type set_size: int
     :param mixtures_list: A list with the paths of the mixtures.
-    :type mixtures_list: list[str]
+    :type mixtures_list: list[pathlib.Path]
     :param sources_list: A list with the paths of the source.
-    :type sources_list: list[str]
+    :type sources_list: list[pathlib.Path]
     :param window_values: The values of the windowing function that we will use.
     :type window_values: numpy.core.multiarray.ndarray
     :param fft_size: The size of the FFT in samples.
@@ -340,8 +340,8 @@ def _get_data_training(current_set, set_size, mixtures_list, sources_list,
     ms_train, vs_train = None, None
 
     for index in range(len(m_list)):
-        mix = wav_read(os.path.join(m_list[index], 'mixture.wav'), mono=False)[0]
-        vox = wav_read(os.path.join(s_list[index], 'vocals.wav'), mono=False)[0]
+        mix = wav_read(m_list[index].joinpath('mixture.wav'), mono=False)[0]
+        vox = wav_read(s_list[index].joinpath('vocals.wav'), mono=False)[0]
 
         ms_seg = stft(
             0.5 * np.sum(mix, axis=-1), window_values,
@@ -376,7 +376,7 @@ def _get_data_testing(sources_parent_path, window_values, fft_size, hop,
     """Gets the actual input and output data for testing.
 
     :param sources_parent_path: The parent path of the sources
-    :type sources_parent_path: str
+    :type sources_parent_path: pathlib.Path
     :param window_values: The values of the windowing function that we will use.
     :type window_values: numpy.core.multiarray.ndarray
     :param fft_size: The size of the FFT in samples.
@@ -395,10 +395,10 @@ def _get_data_testing(sources_parent_path, window_values, fft_size, hop,
     :rtype: numpy.core.multiarray.ndarray
     """
     if not usage_case:
-        bass = wav_read(os.path.join(sources_parent_path, 'bass.wav'), mono=False)[0]
-        drums = wav_read(os.path.join(sources_parent_path, 'drums.wav'), mono=False)[0]
-        others = wav_read(os.path.join(sources_parent_path, 'other.wav'), mono=False)[0]
-        voice = wav_read(os.path.join(sources_parent_path, 'vocals.wav'), mono=False)[0]
+        bass = wav_read(Path(sources_parent_path, 'bass.wav'), mono=False)[0]
+        drums = wav_read(Path(sources_parent_path, 'drums.wav'), mono=False)[0]
+        others = wav_read(Path(sources_parent_path, 'other.wav'), mono=False)[0]
+        voice = wav_read(Path(sources_parent_path, 'vocals.wav'), mono=False)[0]
 
         bg_true = np.sum(bass + drums + others, axis=-1) * 0.5
         voice_true = np.sum(voice, axis=-1) * 0.5
