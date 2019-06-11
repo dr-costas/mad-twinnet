@@ -138,11 +138,11 @@ def testing_process():
 
     total_time = sum(total_time)
 
-    printing.print_msg('Testing finished', start='\n-- ')
+    printing.print_msg('Testing finished', start='\n-- ', end='\n\n')
     printing.print_msg(testing_output_string_all.format(
         sdr=np.median([ii for i in sdr for ii in i[0] if not np.isnan(ii)]),
         sir=np.median([ii for i in sir for ii in i[0] if not np.isnan(ii)]),
-        t=total_time))
+        t=total_time), end='\n\n')
 
     with printing.InformAboutProcess('Saving results... '):
         with open(metrics_paths['sdr'], 'wb') as f:
