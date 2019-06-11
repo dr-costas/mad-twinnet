@@ -193,9 +193,9 @@ def data_process_results_testing(index, voice_true, bg_true, voice_predicted,
     if output_file_name is None:
         voice_hat_path = Path(output_audio_paths['voice_predicted'].format(p=example_index))
         bg_hat_path = Path(output_audio_paths['bg_predicted'].format(p=example_index))
-        wav_write(voice_true, file_name=output_audio_paths['voice_true'].format(p=example_index), **wav_quality)
-        wav_write(bg_true, file_name=output_audio_paths['bg_true'].format(p=example_index), **wav_quality)
-        wav_write(mix, file_name=output_audio_paths['mix'].format(p=example_index), **wav_quality)
+        wav_write(voice_true, file_name=Path(output_audio_paths['voice_true'].format(p=example_index)), **wav_quality)
+        wav_write(bg_true, file_name=Path(output_audio_paths['bg_true'].format(p=example_index)), **wav_quality)
+        wav_write(mix, file_name=Path(output_audio_paths['mix'].format(p=example_index)), **wav_quality)
 
         # Metrics calculation
         sdr, sir = _get_me_the_metrics(bss_eval.bss_eval_images_framewise(
