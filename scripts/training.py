@@ -205,7 +205,7 @@ def training_process():
     printing.print_msg('Training done.', start='\n-- ')
 
     # Save the model
-    with printing.InformAboutProcess('Saving model.. '):
+    with printing.InformAboutProcess('Saving model'):
         save(mad_twin_net.mad.state_dict(), output_states_path['mad'])
 
     # Say goodbye!
