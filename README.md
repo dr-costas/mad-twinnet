@@ -4,7 +4,7 @@
 
 If you know what you are doing, then jump ahead, get the **_pre-trained
 weights_** from 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592), get the paper code version from [here](https://github.com/dr-costas/mad-twinnet/tree/Paper-code), and start using the MaD TwinNet.  
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592), get **_the paper code version from [here](https://github.com/dr-costas/mad-twinnet/releases/tag/Paper-code)**_, and start using the MaD TwinNet.  
 
 If you just need the **_results_**, you can get them from
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164585.svg)](https://doi.org/10.5281/zenodo.1164585)
@@ -79,10 +79,9 @@ the [settings.py](https://arg-redmine.tut.fi/projects/mad-twinnet/repository/rev
 in it or go to the How do I use it (RTFM version)? section.
 
 If you want to re-test or use the MaD TwinNet, you will need 
-the pre-trained weights of the MaD TwinNet. You can get the 
+the pre-trained weights of the MaD TwinNet and the version of the code that can be used with the pre-trained weights. You can get the 
 pre-trained weights from 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592)
-.  
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592) and the version of the code that works with the pre-trained weights from [here](https://github.com/dr-costas/mad-twinnet/releases/tag/Paper-code).
 
 ## What is the MaD TwinNet
 MaD TwinNet stands for the "Masker-Denoiser with Twin Networks
@@ -150,7 +149,7 @@ For the second option, you will have to at least modify the
 
 ### Using the pre-trained weights
 To use the pre-trained weights of the MaD TwinNet, first you have
-to obtain them from [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592), and then **you must get the version of the code that is tagged as "Paper-code"** and available [here](https://github.com/dr-costas/mad-twinnet/tree/Paper-code). 
+to obtain them from [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592), and then **you must get the version of the code that is tagged as "Paper-code"** and available [here]([here](https://github.com/dr-costas/mad-twinnet/releases/tag/Paper-code)). 
 
 Then, you have to unzip the obtained .zip file and move the resulting
 files in the `outputs/states/` directory. These files will be the
