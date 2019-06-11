@@ -85,7 +85,7 @@ testing_output_string_per_example = 'Example: {e:2d}, Median -- ' \
 
 testing_output_string_all = 'Median SDR:{sdr:6.2f} dB | ' \
                             'Median SIR:{sir:6.2f} dB | ' \
-                            'Total time:{t:6.2f} sec(s)'
+                            'Total time:{t:7.2f} sec(s)'
 
 usage_output_string_per_example = '-- File {f} processed. Time: {t:6.2f} sec(s)'
 usage_output_string_total = '-- All files processed. Total time: {t:6.2f} sec(s)'
