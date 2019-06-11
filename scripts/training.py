@@ -196,7 +196,7 @@ def training_process():
     printing.print_msg('Training starts', end='\n\n')
 
     # Auxiliary function for aesthetics
-    p_epoch = partial(
+    one_epoch = partial(
         _one_epoch, module=mad_twin_net,
         epoch_it=epoch_it, solver=optimizer,
         separation_loss=kl, twin_reg_loss=l2_loss,
@@ -209,7 +209,7 @@ def training_process():
     )
 
     # Training
-    [p_epoch(epoch_index=e) for e in range(training_constants['epochs'])]
+    [one_epoch(epoch_index=e) for e in range(training_constants['epochs'])]
 
     # Inform about the past
     printing.print_msg('Training done.', start='\n-- ')
