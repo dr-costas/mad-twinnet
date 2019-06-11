@@ -35,7 +35,7 @@ def wav_read(file_name, mono=False):
     set to true, the returned audio data are monophonic.
 
     :param file_name: The file name of the wav file.
-    :type file_name: str
+    :type file_name: pathlib.Path
     :param mono: Get mono version.
     :type mono: bool
     :return: The data and the sample rate.
@@ -78,7 +78,7 @@ def wav_write(y, sampling_rate, nb_bits, file_name):
     :param nb_bits: The number of bits.
     :type nb_bits: int
     :param file_name: The file name.
-    :type file_name: str
+    :type file_name: pathlib.Path
     :raises ValueError: When the number of bits are not 8 or >= 16.
     """
     x = None
@@ -92,7 +92,7 @@ def wav_write(y, sampling_rate, nb_bits, file_name):
     elif nb_bits > 16:
         x = y
     if x is not None:
-        write(file_name, sampling_rate, x)
+        write(str(file_name), sampling_rate, x)
     else:
         raise ValueError('Could not handle {} number of bits'.format(nb_bits))
 
@@ -102,11 +102,11 @@ def _load_wav_with_wave(file_name):
     for wav files with sample width of 24 bits.
 
     :param file_name: The full file name (extension included).
-    :type file_name: str
+    :type file_name: pathlib.Path
     :return: The audio data and the sampling rate.
     :rtype: (numpy.core.multiarray.ndarray, int)
     """
-    wav = wave.open(file_name)
+    wav = wave.open(str(file_name))
     rate = wav.getframerate()
     nb_channels = wav.getnchannels()
     sample_width = wav.getsampwidth()
@@ -122,11 +122,11 @@ def _load_wav_with_scipy(file_name):
     """Loads a wav file with the :func:`scipy.io.wavfile.read` function.
 
     :param file_name: The full file name (extension included).
-    :type file_name: str
+    :type file_name: pathlib.Path
     :return: The audio data and the sampling rate.
     :rtype: (numpy.core.multiarray.ndarray, int)
     """
-    input_data = read(file_name)
+    input_data = read(str(file_name))
     samples = input_data[1]
     sample_rate = input_data[0]
 
