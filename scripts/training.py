@@ -5,6 +5,7 @@
 """
 
 import time
+from functools import partial
 
 from torch import cuda, from_numpy
 from torch import optim, nn, save
@@ -194,12 +195,21 @@ def training_process():
     # Inform about the future
     printing.print_msg('Training starts', end='\n\n')
 
-    # Training loop
-    [_one_epoch(mad_twin_net, epoch_it, optimizer, kl, l2_loss,
-                sparsity_penalty, l2_reg_squared, device, e,
-                hyper_parameters['lambda_l_twin'], hyper_parameters['lambda_1'],
-                hyper_parameters['lambda_2'], hyper_parameters['max_grad_norm'])
-     for e in range(training_constants['epochs'])]
+    # Auxiliary function for aesthetics
+    p_epoch = partial(
+        _one_epoch, module=mad_twin_net,
+        epoch_it=epoch_it, solver=optimizer,
+        separation_loss=kl, twin_reg_loss=l2_loss,
+        reg_fnn_masker=sparsity_penalty,
+        reg_fnn_dec=l2_reg_squared, device=device,
+        lambda_l_twin=hyper_parameters['lambda_l_twin'],
+        lambda_1=hyper_parameters['lambda_1'],
+        lambda_2=hyper_parameters['lambda_2'],
+        max_grad_norm=hyper_parameters['max_grad_norm']
+    )
+
+    # Training
+    [p_epoch(epoch_index=e) for e in range(training_constants['epochs'])]
 
     # Inform about the past
     printing.print_msg('Training done.', start='\n-- ')
