@@ -43,7 +43,9 @@ def wav_read(file_name, mono=False):
     """
     try:
         samples, sample_rate = _load_wav_with_wave(file_name)
-        sample_width = wave.open(file_name).getsampwidth()
+
+        with wave.open(str(file_name)) as wav:
+            sample_width = wav.getsampwidth()
 
         if sample_width == 1:
             # 8 bit case
@@ -54,7 +56,7 @@ def wav_read(file_name, mono=False):
         elif sample_width == 3:
             # 24 bit case
             samples = samples.astype(float) / _normFact['int24']
-    except Exception:
+    except wave.Error:
         # 32 bit case
         samples, sample_rate = _load_wav_with_scipy(file_name)
 
@@ -106,16 +108,16 @@ def _load_wav_with_wave(file_name):
     :return: The audio data and the sampling rate.
     :rtype: (numpy.core.multiarray.ndarray, int)
     """
-    wav = wave.open(str(file_name))
-    rate = wav.getframerate()
-    nb_channels = wav.getnchannels()
-    sample_width = wav.getsampwidth()
-    nb_frames = wav.getnframes()
-    data = wav.readframes(nb_frames)
-    wav.close()
-    array = _wav_to_array(nb_channels, sample_width, data)
+    with wave.open(str(file_name)) as wav:
+        rate = wav.getframerate()
+        nb_channels = wav.getnchannels()
+        sample_width = wav.getsampwidth()
+        nb_frames = wav.getnframes()
+        data = wav.readframes(nb_frames)
+        wav.close()
+        array = _wav_to_array(nb_channels, sample_width, data)
 
-    return array, rate
+        return array, rate
 
 
 def _load_wav_with_scipy(file_name):
