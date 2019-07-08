@@ -2,13 +2,15 @@
 
 ### Welcome to the repository of the MaD TwinNet. 
 
-If you know what you are doing, then jump ahead, get the **_pre-trained
+If you want to reproduce the results of the paper and know what you are doing, then jump ahead, get the **_pre-trained
 weights_** from 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592), get **_the paper code version from [here](https://github.com/dr-costas/mad-twinnet/releases/tag/Paper-code)_**, and start using the MaD TwinNet.  
 
 If you just need the **_results_**, you can get them from
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164585.svg)](https://doi.org/10.5281/zenodo.1164585)
 .
+
+If you want to re-train MaDTwinNet, then you can use the master branch, as it has the code based on the most up-to-date version of PyTorch. 
 
 There is also an on-line demo of the MaD TwinNet at the [website of
 the MaD TwinNet](http://arg.cs.tut.fi/demo/mad-twinnet).
@@ -78,10 +80,12 @@ the [settings.py](https://arg-redmine.tut.fi/projects/mad-twinnet/repository/rev
 [use_me.py](https://arg-redmine.tut.fi/projects/mad-twinnet/repository/revisions/master/entry/scripts/use_me.py) script, you can find directions
 in it or go to the How do I use it (RTFM version)? section.
 
-If you want to re-test or use the MaD TwinNet, you will need 
+If you want to re-test or use the MaD TwinNet **as it is on the paper**, you will need 
 the pre-trained weights of the MaD TwinNet and the version of the code that can be used with the pre-trained weights. You can get the 
 pre-trained weights from 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1164592.svg)](https://doi.org/10.5281/zenodo.1164592) and the version of the code that works with the pre-trained weights from [here](https://github.com/dr-costas/mad-twinnet/releases/tag/Paper-code).
+
+If you want to re-train the MaDTwinNet and use it for your own reseach/goals, then you can use the most recent version of the code. 
 
 ## What is the MaD TwinNet
 MaD TwinNet stands for the "Masker-Denoiser with Twin Networks
@@ -164,7 +168,8 @@ cannot be used if you alter any members of the classes used
 in the `modules/` directory. 
 
 ### Re-training MaD TwinNet
-You can re-train the MaD TwinNet. For example, you might want to 
+You can re-train the MaD TwinNet, either the mosr recent version
+or the paper version of the code. For example, you might want to 
 try and find better hyper-parameters, try how the MaD TwinNet will
 go on a different training dataset, or any other wonderful idea :)
 
