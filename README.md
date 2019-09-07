@@ -93,7 +93,7 @@ architecture/method" for monaural music sound source separation.
 An illustration of the MaD TwinNet can be seen in the following 
 figure: 
 
-![Illustration of MaD TwinNet](http://arg.cs.tut.fi/demo/mad-twinnet/assets/media/images/method.png)
+![Illustration of MaD TwinNet](https://www.researchgate.net/profile/Paul_Magron/publication/327389522/figure/fig2/AS:677684220801029@1538583917267/Illustration-of-the-Mad-TwinNet-system-adapted-from-18-With-green-color-is-the.ppm)
 
 You can read more at [our paper on arXiv](https://arxiv.org/abs/1802.00300). 
 
