@@ -93,7 +93,7 @@ architecture/method" for monaural music sound source separation.
 An illustration of the MaD TwinNet can be seen in the following 
 figure: 
 
-![Illustration of MaD TwinNet](https://drive.google.com/file/d/1Oat5CVwOwY2CL0sPWYuhu0ky7Rz5Hkq7/view?usp=sharing)
+![Illustration of MaD TwinNet](method_illustration.png)
 
 You can read more at [our paper on arXiv](https://arxiv.org/abs/1802.00300). 
 
