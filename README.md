@@ -112,14 +112,14 @@ To install the dependencies, you can either use the `pip` package
 manager or the `anaconda`/`conda`. 
 
 If you want to **use the `pip`**, then you have to
-- clone our repository (e.g. `git clone `),
+- clone our repository (e.g. `git clone`),
 - navigate with your terminal inside the directory of the cloned 
   repo (e.g. `cd mad-twinnet`), and then
 - issue at your terminal the command 
 `pip install -r requirements.txt` 
 
 If you want to **use the `anaconda`/`conda`**, then you have to
-- clone our repository (e.g. `git clone `),
+- clone our repository (e.g. `git clone`),
 - navigate with your terminal inside the directory of the cloned 
   repo (e.g. `cd mad-twinnet`), and then
 - issue at your terminal the command 
